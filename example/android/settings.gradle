@@ -1,0 +1,3 @@
+rootProject.name = 'YANavigatorExample'
+
+include ':app'

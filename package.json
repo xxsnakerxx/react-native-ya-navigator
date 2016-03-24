@@ -1,0 +1,23 @@
+{
+  "name": "react-native-ya-navigator",
+  "version": "0.1.0",
+  "description": "Yet another react native navigator component",
+  "main": "Navigator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xxsnakerxx/react-native-ya-navigator.git"
+  },
+  "keywords": [
+    "react-native",
+    "navigator"
+  ],
+  "author": "Dmitriy Kolesnikov <xxsnakerxx@gmail.com> (https://github.com/xxsnakerxx)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xxsnakerxx/react-native-ya-navigator/issues"
+  },
+  "homepage": "https://github.com/xxsnakerxx/react-native-ya-navigator#readme"
+}
