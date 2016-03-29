@@ -218,6 +218,7 @@ export default class YANavigator extends React.Component {
       navBarStyle,
       navBarComponentsDefaultStyles,
       style,
+      sceneStyle,
     } = this.props;
 
     return (
@@ -234,6 +235,7 @@ export default class YANavigator extends React.Component {
             initialRoute.component.navigationDelegate.navBarIsHidden :
             false
         )}
+        sceneStyle={sceneStyle}
         onWillFocus={this._onWillFocus}
         style={[
           styles.navigator,
