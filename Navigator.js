@@ -260,6 +260,8 @@ export default class YANavigator extends React.Component {
       Navigator.SceneConfigs.FadeAndroid :
       Navigator.SceneConfigs.PushFromRight,
   };
+
+  static navBarHeight = Scene.navBarHeight;
 }
 
 const styles = StyleSheet.create({

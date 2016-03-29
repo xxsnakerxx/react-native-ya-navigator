@@ -158,7 +158,7 @@ class MyScene extends React.Component {
   }
 ```
 
-Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__default value__) then scene will have top padding equals height of the navigation bar)
+Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__default value__) then scene will have top padding equals height of the navigation bar, also you can use `YANavigator.navBarHeight` in your styles)
 
 ### How to handle navigation bar items press events
 

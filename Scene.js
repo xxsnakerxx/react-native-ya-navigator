@@ -82,7 +82,7 @@ export default class Scene extends React.Component {
           {
             flex: 1,
             paddingTop: this.props.paddingTop ?
-              Navigator.NavigationBar.Styles.General.TotalNavHeight :
+              Scene.navBarHeight :
               0,
           },
           this.props.style,
@@ -105,4 +105,6 @@ export default class Scene extends React.Component {
   static defaultProps = {
     paddingTop: true,
   };
+
+  static navBarHeight = Navigator.NavigationBar.Styles.General.TotalNavHeight;
 }
