@@ -6,6 +6,7 @@ const {
   View,
   Text,
   TouchableOpacity,
+  Platform,
 } = React;
 
 export default class NavBarBtn extends React.Component {
@@ -28,7 +29,12 @@ export default class NavBarBtn extends React.Component {
         <TouchableOpacity
           style={alignment}
           onPress={onPress}>
-          <Text style={[styles.navBarButtonText, textStyle]}>{text}</Text>
+          <Text
+            numberOfLines={1}
+            allowFontScaling={false}
+            style={[styles.navBarButtonText, textStyle]}>
+            {text}
+          </Text>
         </TouchableOpacity>
       )
     } else {
@@ -59,6 +65,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   navBarButtonText: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'ios' ? 16 : 20,
   },
 })

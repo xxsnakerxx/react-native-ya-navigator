@@ -5,6 +5,7 @@ const {
   PropTypes,
   Text,
   TouchableOpacity,
+  Platform,
 } = React;
 
 export default class NavBarTitle extends React.Component {
@@ -18,7 +19,14 @@ export default class NavBarTitle extends React.Component {
     } = this.props;
 
     if (text) {
-      child = <Text style={[styles.navBarTitleText, textStyle]}>{text}</Text>
+      child = (
+        <Text
+          allowFontScaling={false}
+          numberOfLines={1}
+          style={[styles.navBarTitleText, textStyle]}>
+          {text}
+        </Text>
+      )
     } else {
       child = this.props.children;
     }
@@ -43,6 +51,6 @@ export default class NavBarTitle extends React.Component {
 
 const styles = StyleSheet.create({
   navBarTitleText: {
-    fontSize: 18,
+    fontSize: Platform.OS === 'ios' ? 16 : 20,
   },
 })
