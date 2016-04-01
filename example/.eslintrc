@@ -1,0 +1,74 @@
+{
+    env: {
+        browser: true,
+        es6: true,
+        node: true,
+        jest: true,
+    },
+
+    parserOptions: {
+        sourceType: "module",
+        ecmaVersion: 6,
+        ecmaFeatures: {
+            jsx: true,
+        }
+    },
+
+    parser: "babel-eslint",
+
+    plugins: [
+        "react",
+        "react-native",
+    ],
+
+    extends: "eslint:recommended",
+
+    globals: {
+        __DEV__: true,
+    },
+
+    rules: {
+        quotes: [1, "single", "avoid-escape"],
+        jsx-quotes: [2, "prefer-single"],
+        no-constant-condition: 0,
+        no-extend-native: 0,
+        no-console: 0,
+        curly: 0,
+        no-alert: 0,
+        no-trailing-spaces: [2, { "skipBlankLines": true }],
+        comma-dangle: [2, "always-multiline"],
+        no-unused-expressions: 0,
+        no-underscore-dangle: 0,
+        no-dupe-keys: 2,
+        key-spacing: 2,
+        no-const-assign: 2,
+        prefer-const: 2,
+        object-shorthand: 2,
+        prefer-spread: 2,
+        prefer-template: 2,
+        prefer-arrow-callback: 2,
+        no-var: 2,
+        no-extra-bind: 2,
+        arrow-parens: 2,
+        arrow-spacing: 2,
+        brace-style: 2,
+        array-callback-return: 2,
+        keyword-spacing: 2,
+        newline-per-chained-call: [2, { "ignoreChainWithDepth": 4}],
+        no-new-symbol: 2,
+        no-self-assign: 2,
+        no-whitespace-before-property: 2,
+        "react/no-direct-mutation-state": 2,
+        "react/prefer-es6-class": 2,
+        "react/prop-types": [2, { "ignore": ["dispatch", "navigator", "children"] }],
+        "react/react-in-jsx-scope": 2,
+        "react/self-closing-comp": 2,
+        "react/wrap-multilines": 2,
+        "react/jsx-no-duplicate-props": 2,
+        "react/jsx-no-undef": 2,
+        "react/jsx-uses-react": 2,
+        "react/jsx-uses-vars": 2,
+        "react/jsx-no-literals": 2,
+        "react-native/no-unused-styles": 2,
+    }
+}
