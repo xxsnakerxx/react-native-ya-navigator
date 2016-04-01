@@ -1,6 +1,7 @@
 # React Native Yet Another Navigator
 
-![preview](images/ya_navigator.gif)
+![preview_ios](images/ya_navigator_ios.gif)
+![preview_android](images/ya_navigator_android.gif)
 
 ## Table of contents
 - [Main goals](#main-goals)
@@ -18,6 +19,9 @@
 
 ## Installation
 
+First of all, this component uses awesome [react-native-vector-icons](https://github.com/oblador/react-native-vector-icons#readme), so you need to install it (it's simple)...
+
+then,
 
 ```javascript
 npm install react-native-ya-navigator --save
@@ -43,18 +47,13 @@ class App extends React.Component {
        navBarComponentsDefaultStyles={{
          title: {
            color: '#fff',
-           marginVertical: 11,
            fontWeight: '500',
          },
          leftBtn: {
            color: '#fff',
-           marginVertical: 11,
-           marginLeft: 10,
          },
          rightBtn: {
            color: '#fff',
-           marginVertical: 13,
-           marginRight: 10,
          }
        }}
      />
@@ -63,8 +62,14 @@ class App extends React.Component {
 }
 ```
 
-Also you can provide `style` prop and `defaultSceneConfig` (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
+Also you can provide some other props
+  - style
+  - defaultSceneConfig (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
 and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
+  - navBarBackIcon
+  - sceneStyle
+
+Also `YANavigator` class has static property `navBarHeight` (you can use it in your styles)
 
 ### Navigation bar configuration in a scene
 
@@ -90,6 +95,10 @@ class MyScene extends React.Component {
      */
     navBarIsHidden: true|false,
     /**
+     * @type {String}
+     */
+    navBarBackgroundColor: 'red',
+    /**
      * @param  {object} props [route props]
      * @return {ReactElement|Object}
      */
@@ -101,9 +110,7 @@ class MyScene extends React.Component {
         }
       }
       // or
-      return MyTitleComponent
-      // or
-      return <MyTitleComponent {...props}/>
+      return <MyTitleComponent title={'Title'}/>
     },
     /**
      * @param  {object} props [route props]
@@ -136,6 +143,13 @@ class MyScene extends React.Component {
       return MyButtonComponent
       // or
       return <MyButtonComponent {...props}/>
+    },
+    /**
+     * will be called first on back android button press
+     * @param  {object} navigator [navigator instance]
+     */
+    onAndroidBackPress(navigator) {
+      navigator.popToPop();
     }
   }
 }
@@ -199,18 +213,20 @@ class MyScene extends React.Component {
 ### How to change navigation bar items dynamically
 
 It's little bit tricky :) YANavigator render custom NavBar component that has some helpful methods
-- setTitle
-- setLeftBtn
-- setRightBtn
-- show
-- hide
+- updateUI
+- show('fade'|'slide') __default behavior is `fade`__
+- hide('fade'|'slide') __default behavior is `fade`__
 
 
 ```javascript
 class MyScene extends React.Component {
   onNavBarTitlePress() {
     this.props.navigator._navBar
-    setTitle('New title')
+    updateUI({
+      title: 'New title',
+      leftBtn: <MyAwesomeBtn text={'left'}/>,
+      rightBtn: <MyAwesomeBtn text={'right'}/>,
+    })
   }
 
   render() {
