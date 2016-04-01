@@ -14,6 +14,7 @@ import React, {
   StatusBar,
   Navigator,
   ProgressBarAndroid,
+  ScrollView,
 } from 'react-native';
 
 class YANavigatorExample extends Component {
@@ -29,19 +30,14 @@ class YANavigatorExample extends Component {
         navBarComponentsDefaultStyles={{
           title: {
             color: '#fff',
-            marginVertical: 16,
-            fontWeight: '500',
+            fontWeight: '400',
           },
           leftBtn: {
             color: '#fff',
-            marginVertical: 18,
-            marginLeft: 10,
           },
           rightBtn: {
             color: '#fff',
-            marginVertical: 18,
-            marginRight: 10,
-          }
+          },
         }}
       />
     );
@@ -59,30 +55,28 @@ class View1 extends Component {
 
   render() {
     return (
-      <View style={{flex: 1}}>
+      <YANavigator.Scene
+        delegate={this}
+        style={styles.container}>
         <StatusBar
           barStyle={'light-content'}
-          animated={true} />
-
-          <YANavigator.Scene
-            delegate={this}
-            style={styles.container}>
-            <Text style={styles.welcome}>
-              React Native is AWESOME!
-            </Text>
-            <Text
-              style={styles.text}
-              onPress={() => this.props.navigator.push({
-                component: View2,
-                props: {
-                  leftBtnText: 'Back',
-                  rightBtnText: 'Do smth',
-                }
-              })}>
-              {'Push next view'}
-            </Text>
-          </YANavigator.Scene>
-      </View>
+          animated={true}
+          backgroundColor={'green'}/>
+        <Text style={styles.welcome}>
+          {'React Native is AWESOME!'}
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() => this.props.navigator.push({
+            component: View2,
+            props: {
+              leftBtnText: 'Back',
+              rightBtnText: 'Do smth',
+            },
+          })}>
+          {'Push next view'}
+        </Text>
+      </YANavigator.Scene>
     )
   }
 
@@ -95,7 +89,7 @@ class View1 extends Component {
     },
     getNavBarLeftBtn() {
       return {
-        text: 'Left btn',
+        text: 'Left',
       }
     },
     getNavBarRightBtn() {
@@ -121,12 +115,10 @@ class View2 extends Component {
       titlePressCount: ++this.state.titlePressCount,
     }, () => {
       this.props.navigator._navBar
-        .setTitle(`Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}`);
+        .updateUI({
+          title: `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}`,
+        })
     })
-  }
-
-  onNavBarLeftBtnPress() {
-    this.props.navigator.pop();
   }
 
   onNavBarRightBtnPress() {
@@ -140,6 +132,10 @@ class View2 extends Component {
       <YANavigator.Scene
         delegate={this}
         style={styles.container}>
+        <StatusBar
+          barStyle={'light-content'}
+          animated={true}
+          backgroundColor={'black'}/>
         <Text style={styles.welcome}>
           {'View 2'}
         </Text>
@@ -156,15 +152,18 @@ class View2 extends Component {
               fetching: !this.state.fetching,
             }, () => {
               this.props.navigator._navBar
-              .setRightBtn(
-                this.state.fetching ?
+              .updateUI({
+                rightBtn: this.state.fetching ?
                 <ProgressBarAndroid
                   styleAttr={'Small'}
-                  color={'#fff'}
-                  style={{marginVertical: 5}}/> :
-                {
-                  text: this.props.rightBtnText || 'Right btn',
-                })
+                  color={'#fff'} /> :
+                  {
+                    text: this.props.rightBtnText || 'Right btn',
+                  },
+                title: this.state.fetching ?
+                  'Fetching...' :
+                  this.state.titlePressCount ? `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}` : 'Press me!!!',
+              })
             })
         }}>
           {`${this.state.fetching ? 'Stop' : 'Start'} fake fetching something`}
@@ -185,12 +184,7 @@ class View2 extends Component {
     getNavBarTitle() {
       return {
         text: 'Press me!!!',
-        onPress: true,
-      }
-    },
-    getNavBarLeftBtn(props) {
-      return {
-        text: props.leftBtnText || 'Left btn',
+        touchable: true,
       }
     },
     getNavBarRightBtn(props) {
@@ -198,6 +192,7 @@ class View2 extends Component {
         text: props.rightBtnText || 'Right btn',
       }
     },
+    navBarBackgroundColor: '#000',
   }
 }
 
@@ -212,6 +207,15 @@ class View3 extends Component {
         <Text
           style={styles.text}
           onPress={() => this.props.navigator.pop()}>{'Get back'}</Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator.push({
+              component: View4,
+            })
+          }}>
+          {'Push next view'}
+        </Text>
       </YANavigator.Scene>
     )
   }
@@ -219,7 +223,142 @@ class View3 extends Component {
   static navigationDelegate = {
     id: 'view3',
     navBarIsHidden: true,
+    backBtnText: 'Hey!!!',
     sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+  }
+}
+
+class View4 extends Component {
+  render() {
+    return (
+      <YANavigator.Scene
+        delegate={this}
+        style={styles.container}>
+        <StatusBar
+          barStyle={'light-content'}
+          animated={true}
+          backgroundColor={'red'}/>
+        <Text style={styles.welcome}>{'View 4'}</Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator.push({
+              component: View5,
+            })
+          }}>
+          {'Push next view'}
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator._navBar.hide();
+          }}>
+          {'Hide nav bar'}
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator._navBar.show();
+          }}>
+          {'Show nav bar'}
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator._navBar.hide('slide');
+          }}>
+          {'Hide nav bar - slide'}
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() => {
+            this.props.navigator._navBar.show('slide');
+          }}>
+          {'Show nav bar - slide'}
+        </Text>
+      </YANavigator.Scene>
+    )
+  }
+
+  static navigationDelegate = {
+    id: 'view4',
+    navBarBackgroundColor: 'red',
+    getNavBarTitle() {
+      return {
+        text: 'Yo ho ho',
+      }
+    },
+    getNavBarRightBtn() {
+      return {
+        text: 'YAY',
+      }
+    },
+  }
+}
+
+class View5 extends Component {
+  onNavBarRightBtnPress() {
+    this.props.navigator.immediatelyResetRouteStack([
+      {
+        component: View1,
+      },
+    ])
+  }
+
+  render() {
+    return (
+      <YANavigator.Scene
+        paddingTop={false}
+        delegate={this}
+        style={[styles.container, {backgroundColor: 'yellow'}]}>
+        <StatusBar
+          animated={true}
+          barStyle={'default'}
+          backgroundColor={'rgba(0, 0, 0, 0.5)'}/>
+        <ScrollView
+          style={{
+            paddingTop: YANavigator.Scene.navBarHeight * 2,
+          }}>
+          <View style={styles.container}>
+            <Text style={[styles.welcome, {color: 'red'}]}>{'Scroll me!'}</Text>
+            <Text
+              style={[styles.text, {color: 'red'}]}
+              onPress={() => {
+                this.props.navigator.popToTop()
+              }}>
+              {'Go to first view'}
+            </Text>
+          </View>
+        </ScrollView>
+      </YANavigator.Scene>
+    )
+  }
+
+  static navigationDelegate = {
+    id: 'view5',
+    navBarBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+    getNavBarLeftBtn() {
+      return <ProgressBarAndroid styleAttr={'Small'} color={'#fff'} />
+    },
+    getNavBarTitle() {
+      return {
+        text: 'The looooongest title',
+        style: {
+          color: '#000',
+        },
+      }
+    },
+    getNavBarRightBtn() {
+      return {
+        text: 'Reset',
+        style: {
+          color: '#000',
+        },
+      }
+    },
+    onAndroidBackPress(navigator) {
+      navigator.popToTop();
+    },
   }
 }
 
