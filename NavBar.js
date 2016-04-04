@@ -386,8 +386,8 @@ export default class NavBar extends React.Component {
           {
             opacity: isGoingBack && prevRoute.component.navigationDelegate.navBarIsHidden ?
               animationProgress.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0],
+                inputRange: [0, 0.5, 1],
+                outputRange: [1, 0, 0],
               }) :
               opacity,
             transform: [
