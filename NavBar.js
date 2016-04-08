@@ -204,13 +204,13 @@ export default class NavBar extends React.Component {
     const navBarBackgroundColor =
       routeStack[animationToIndex] &&
       routeMapper.navBarBackgroundColor(routeStack[animationToIndex]) ||
-      style.backgroundColor ||
+      (style && style.backgroundColor) ||
       NAV_BAR_DEFAULT_BACKGROUND_COLOR;
 
     const prevNavBarBackgroundColor =
       routeStack[animationFromIndex] &&
       routeMapper.navBarBackgroundColor(routeStack[animationFromIndex]) ||
-      style.backgroundColor ||
+      (style && style.backgroundColor) ||
       NAV_BAR_DEFAULT_BACKGROUND_COLOR;
 
     const navBarBackgroundColorStyle = {
