@@ -54,8 +54,6 @@ export default class YANavigator extends React.Component {
   _renderScene = (route, navigator) => {
     let Component;
 
-    console.log(route.component);
-
     if (typeof route.component === 'object') {
       Component = React.cloneElement(route.component, {
         navigator,
