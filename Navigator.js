@@ -6,6 +6,8 @@ import NavBarBtn from './NavBarBtn';
 
 import Scene from './Scene';
 
+import { getNavigationDelegate } from './utils';
+
 import * as constants from './constants';
 
 const {
@@ -25,11 +27,11 @@ export default class YANavigator extends React.Component {
         const navState = navigator.state;
         const presentedComponent =
           navState.routeStack[navState.presentedIndex].component;
+        const navigationDelegate = getNavigationDelegate(presentedComponent)
 
-        if (presentedComponent.navigationDelegate &&
-            presentedComponent.navigationDelegate.onAndroidBackPress) {
+        if (navigationDelegate && navigationDelegate.onAndroidBackPress) {
 
-          presentedComponent.navigationDelegate.onAndroidBackPress(navigator);
+          navigationDelegate.onAndroidBackPress(navigator);
 
           return true;
         } else if (navState.routeStack.length > 1) {
@@ -52,6 +54,8 @@ export default class YANavigator extends React.Component {
   _renderScene = (route, navigator) => {
     let Component;
 
+    console.log(route.component);
+
     if (typeof route.component === 'object') {
       Component = React.cloneElement(route.component, {
         navigator,
@@ -70,8 +74,9 @@ export default class YANavigator extends React.Component {
   };
 
   _configureScene = (route) => {
-    return (route.component.navigationDelegate &&
-            route.component.navigationDelegate.sceneConfig) ||
+    const navigationDelegate = getNavigationDelegate(route.component);
+
+    return (navigationDelegate && navigationDelegate.sceneConfig) ||
             this.props.defaultSceneConfig;
   };
 
@@ -95,11 +100,13 @@ export default class YANavigator extends React.Component {
           navBarBackgroundColor: (route) => {
             let navBarBackgroundColor = '';
 
-            if (route.component.navigationDelegate &&
-                route.component.navigationDelegate.navBarBackgroundColor) {
+            const navigationDelegate = getNavigationDelegate(route.component);
+
+            if (navigationDelegate &&
+                navigationDelegate.navBarBackgroundColor) {
 
                 navBarBackgroundColor =
-                  route.component.navigationDelegate.navBarBackgroundColor;
+                  navigationDelegate.navBarBackgroundColor;
             }
 
             return navBarBackgroundColor;
@@ -108,12 +115,12 @@ export default class YANavigator extends React.Component {
           LeftButton: (route, navigator, index, state) => {
             let LeftBtn = null;
 
-            if (route.component.navigationDelegate &&
-                route.component.navigationDelegate.getNavBarLeftBtn) {
+            const navigationDelegate = getNavigationDelegate(route.component);
 
-              LeftBtn =
-                route.component.navigationDelegate
-                .getNavBarLeftBtn(route.props || {});
+            if (navigationDelegate &&
+                navigationDelegate.getNavBarLeftBtn) {
+
+              LeftBtn = navigationDelegate.getNavBarLeftBtn(route.props || {});
 
               if (!LeftBtn) return null;
 
@@ -153,13 +160,15 @@ export default class YANavigator extends React.Component {
               if (index > 0) {
                 // tell navBar to render back button
                 const previousComponent = state.routeStack[index - 1].component;
+                const previousNavigationDelegate =
+                  getNavigationDelegate(state.routeStack[index - 1].component);
 
                 return {
                   isBackBtn: true,
-                  text: (previousComponent.navigationDelegate &&
-                    (previousComponent.navigationDelegate.backBtnText) ||
-                    (previousComponent.navigationDelegate.getNavBarTitle &&
-                    previousComponent.navigationDelegate.getNavBarTitle().text)) || '',
+                  text: (previousNavigationDelegate &&
+                    (previousNavigationDelegate.backBtnText) ||
+                    (previousNavigationDelegate.getNavBarTitle &&
+                    previousNavigationDelegate.getNavBarTitle().text)) || '',
                   textStyle: leftBtnStyle,
                 }
               }
@@ -172,12 +181,12 @@ export default class YANavigator extends React.Component {
           RightButton: (route) => {
             let RightBtn = null;
 
-            if (route.component.navigationDelegate &&
-                route.component.navigationDelegate.getNavBarRightBtn) {
+            const navigationDelegate = getNavigationDelegate(route.component);
 
-              RightBtn =
-                route.component.navigationDelegate
-                .getNavBarRightBtn(route.props || {});
+            if (navigationDelegate &&
+                navigationDelegate.getNavBarRightBtn) {
+
+              RightBtn = navigationDelegate.getNavBarRightBtn(route.props || {});
 
               if (!RightBtn) return null;
 
@@ -221,12 +230,12 @@ export default class YANavigator extends React.Component {
           Title: (route) => {
             let Title = null;
 
-            if (route.component.navigationDelegate &&
-                route.component.navigationDelegate.getNavBarTitle) {
+            const navigationDelegate = getNavigationDelegate(route.component);
 
-              Title =
-                route.component.navigationDelegate
-                .getNavBarTitle(route.props || {});
+            if (navigationDelegate &&
+                navigationDelegate.getNavBarTitle) {
+
+              Title = navigationDelegate.getNavBarTitle(route.props || {});
 
               if (!Title) return null;
 
@@ -258,9 +267,10 @@ export default class YANavigator extends React.Component {
     const component = route.component;
     const navBar = this.refs.navigator &&
       this.refs.navigator._navBar;
+    const navigationDelegate = getNavigationDelegate(component);
 
-    if (navBar && component.navigationDelegate) {
-      component.navigationDelegate.navBarIsHidden ?
+    if (navBar && navigationDelegate) {
+      navigationDelegate.navBarIsHidden ?
         navBar.hide() :
         navBar.show();
     }
@@ -292,6 +302,8 @@ export default class YANavigator extends React.Component {
       navBarBackIcon,
     } = this.props;
 
+    const navigationDelegate = getNavigationDelegate(initialRoute.component);
+
     return (
       <Navigator
         ref={'navigator'}
@@ -302,8 +314,8 @@ export default class YANavigator extends React.Component {
         navigationBar={this._renderNavigationBar(
           navBarStyle,
           navBarComponentsDefaultStyles,
-          initialRoute.component.navigationDelegate ?
-            initialRoute.component.navigationDelegate.navBarIsHidden :
+          navigationDelegate ?
+            navigationDelegate.navBarIsHidden :
             false,
           navBarBackIcon
         )}

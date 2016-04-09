@@ -2,6 +2,8 @@ import React from 'react-native';
 
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
+import { getNavigationDelegate } from './utils';
+
 const {
   View,
   Text,
@@ -45,10 +47,11 @@ export default class NavBar extends React.Component {
 
   _setTitle(title) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
+    const navigationDelegate = getNavigationDelegate(currentRoute.component);
     const oldTitle =
-      currentRoute.component.navigationDelegate &&
-      currentRoute.component.navigationDelegate.getNavBarTitle &&
-      currentRoute.component.navigationDelegate.getNavBarTitle();
+      navigationDelegate &&
+      navigationDelegate.getNavBarTitle &&
+      navigationDelegate.getNavBarTitle();
 
     if (oldTitle) {
       let newTitle = null;
@@ -60,35 +63,37 @@ export default class NavBar extends React.Component {
             title,
           });
 
-          currentRoute.component.navigationDelegate
+          navigationDelegate
             .getNavBarTitle = () => newTitle;
         } else {
-          currentRoute.component.navigationDelegate
+          navigationDelegate
             .getNavBarTitle = () => Object.assign({}, oldTitle, {
               text: title,
             });
         }
       }
     } else {
-      if (currentRoute.component.navigationDelegate) {
-        currentRoute.component.navigationDelegate.getNavBarTitle = () => title;
+      if (navigationDelegate) {
+        navigationDelegate.getNavBarTitle = () => title;
       }
     }
   }
 
   _setLeftBtn(btn) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
+    const navigationDelegate = getNavigationDelegate(currentRoute.component);
 
-    if (currentRoute.component.navigationDelegate) {
-      currentRoute.component.navigationDelegate.getNavBarLeftBtn = () => btn;
+    if (navigationDelegate) {
+      navigationDelegate.getNavBarLeftBtn = () => btn;
     }
   }
 
   _setRightBtn(btn) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
+    const navigationDelegate = getNavigationDelegate(currentRoute.component);
 
-    if (currentRoute.component.navigationDelegate) {
-      currentRoute.component.navigationDelegate.getNavBarRightBtn = () => btn;
+    if (navigationDelegate) {
+      navigationDelegate.getNavBarRightBtn = () => btn;
     }
   }
 
@@ -384,7 +389,9 @@ export default class NavBar extends React.Component {
           styles.navBar,
           navBarBackgroundColorStyle,
           {
-            opacity: isGoingBack && prevRoute.component.navigationDelegate.navBarIsHidden ?
+            opacity: isGoingBack &&
+                    getNavigationDelegate(prevRoute.component) &&
+                    getNavigationDelegate(prevRoute.component).navBarIsHidden ?
               animationProgress.interpolate({
                 inputRange: [0, 0.5, 1],
                 outputRange: [1, 0, 0],
