@@ -7,13 +7,13 @@
   },
   "dependencies": {
     "react": "^0.14.8",
-    "react-native": "^0.22.2",
+    "react-native": "^0.23.1",
     "react-native-ya-navigator": "file:../"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.2",
-    "eslint": "^2.6.0",
-    "eslint-plugin-react": "^4.2.3",
+    "eslint": "^2.7.0",
+    "eslint-plugin-react": "^4.3.0",
     "eslint-plugin-react-native": "^1.0.0"
   }
 }
