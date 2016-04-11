@@ -1,4 +1,5 @@
 import React from 'react-native';
+import omit from 'lodash.omit';
 
 import NavBar from './NavBar';
 import NavBarTitle from './NavBarTitle';
@@ -18,6 +19,9 @@ const {
   Platform,
   BackAndroid,
 } = React;
+
+const validTextStyles =
+  Object.keys(require('react-native/Libraries/Text/TextStylePropTypes'));
 
 export default class YANavigator extends React.Component {
   componentDidMount() {
@@ -124,9 +128,7 @@ export default class YANavigator extends React.Component {
 
               if (typeof LeftBtn === 'object') {
                 if (React.isValidElement(LeftBtn)) {
-                  const _leftBtnStyle = Object.assign({}, leftBtnStyle);
-
-                  delete _leftBtnStyle.color;
+                  const _leftBtnStyle = omit(leftBtnStyle, validTextStyles);
 
                   LeftBtn = React.createElement(NavBarBtn, {
                     onPress: this._emitNavBarLeftBtnPress.bind(this, route),
@@ -143,9 +145,7 @@ export default class YANavigator extends React.Component {
                   )
                 }
               } else if (typeof LeftBtn === 'function') {
-                const _leftBtnStyle = Object.assign({}, leftBtnStyle);
-
-                delete _leftBtnStyle.color;
+                const _leftBtnStyle = omit(leftBtnStyle, validTextStyles);
 
                 LeftBtn =
                   (<NavBarBtn
@@ -190,9 +190,7 @@ export default class YANavigator extends React.Component {
 
               if (typeof RightBtn === 'object') {
                 if (React.isValidElement(RightBtn)) {
-                  const _rightBtnStyle = Object.assign({}, rightBtnStyle);
-
-                  delete _rightBtnStyle.color;
+                  const _rightBtnStyle = omit(rightBtnStyle, validTextStyles);
 
                   RightBtn = React.createElement(NavBarBtn, {
                     onPress: this._emitNavBarRightBtnPress.bind(this, route),
@@ -209,9 +207,7 @@ export default class YANavigator extends React.Component {
                   )
                 }
               } else if (typeof RightBtn === 'function') {
-                const _rightBtnStyle = Object.assign({}, rightBtnStyle);
-
-                delete _rightBtnStyle.color;
+                const _rightBtnStyle = omit(rightBtnStyle, validTextStyles);
 
                 RightBtn =
                   (<NavBarBtn
