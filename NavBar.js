@@ -217,13 +217,19 @@ export default class NavBar extends React.Component {
       (style && style.backgroundColor) ||
       NAV_BAR_DEFAULT_BACKGROUND_COLOR;
 
-    const navBarBackgroundColorStyle = {
-      backgroundColor: animationProgress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [prevNavBarBackgroundColor, navBarBackgroundColor],
-        extrapolate: false,
-      }),
+    let navBarBackgroundColorStyle = {
+      backgroundColor: navBarBackgroundColor,
     };
+
+    if (navBarBackgroundColor !== prevNavBarBackgroundColor) {
+      navBarBackgroundColorStyle = {
+        backgroundColor: animationProgress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [prevNavBarBackgroundColor, navBarBackgroundColor],
+          extrapolate: false,
+        }),
+      };
+    }
 
     const isGoingBack = animationToIndex < animationFromIndex;
 
