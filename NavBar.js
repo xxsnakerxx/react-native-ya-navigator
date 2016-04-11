@@ -48,10 +48,11 @@ export default class NavBar extends React.Component {
   _setTitle(title) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
+    const routeProps = currentRoute.props || {};
     const oldTitle =
       navigationDelegate &&
       navigationDelegate.getNavBarTitle &&
-      navigationDelegate.getNavBarTitle();
+      navigationDelegate.getNavBarTitle(routeProps);
 
     if (oldTitle) {
       let newTitle = null;
@@ -64,17 +65,17 @@ export default class NavBar extends React.Component {
           });
 
           navigationDelegate
-            .getNavBarTitle = () => newTitle;
+            .getNavBarTitle = (routeProps) => newTitle;
         } else {
           navigationDelegate
-            .getNavBarTitle = () => Object.assign({}, oldTitle, {
+            .getNavBarTitle = (routeProps) => Object.assign({}, oldTitle, {
               text: title,
             });
         }
       }
     } else {
       if (navigationDelegate) {
-        navigationDelegate.getNavBarTitle = () => title;
+        navigationDelegate.getNavBarTitle = (routeProps) => title;
       }
     }
   }
@@ -82,18 +83,20 @@ export default class NavBar extends React.Component {
   _setLeftBtn(btn) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
+    const routeProps = currentRoute.props || {};
 
     if (navigationDelegate) {
-      navigationDelegate.getNavBarLeftBtn = () => btn;
+      navigationDelegate.getNavBarLeftBtn = (routeProps) => btn;
     }
   }
 
   _setRightBtn(btn) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
+    const routeProps = currentRoute.props || {};
 
     if (navigationDelegate) {
-      navigationDelegate.getNavBarRightBtn = () => btn;
+      navigationDelegate.getNavBarRightBtn = (routeProps) => btn;
     }
   }
 
