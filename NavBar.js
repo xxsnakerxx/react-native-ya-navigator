@@ -132,17 +132,13 @@ export default class NavBar extends React.Component {
   show(type = 'fade') {
     if (type === 'fade') {
       this.state.y.setValue(0);
-      this.state.opacity.setValue(0);
 
       Animated.timing(this.state.opacity, {
         toValue: 1,
         duration: 200,
-      }).start(() => {
-        this.state.opacity.setValue(1);
-      });
+      }).start();
     } else if (type === 'slide') {
       this.state.opacity.setValue(1);
-      this.state.y.setValue(-NAV_HEIGHT);
 
       Animated.timing(this.state.y, {
         toValue: 0,
