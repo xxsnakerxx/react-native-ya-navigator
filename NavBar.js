@@ -131,23 +131,23 @@ export default class NavBar extends React.Component {
 
   show(type = 'fade') {
     if (type === 'fade') {
-      this.setState({
-        y: new Animated.Value(0),
-      }, () => {
-        Animated.timing(this.state.opacity, {
-          toValue: 1,
-          duration: 200,
-        }).start();
-      })
+      this.state.y.setValue(0);
+      this.state.opacity.setValue(0);
+
+      Animated.timing(this.state.opacity, {
+        toValue: 1,
+        duration: 200,
+      }).start(() => {
+        this.state.opacity.setValue(1);
+      });
     } else if (type === 'slide') {
-      this.setState({
-        opacity: new Animated.Value(1),
-      }, () => {
-        Animated.timing(this.state.y, {
-          toValue: 0,
-          duration: 100,
-        }).start();
-      })
+      this.state.opacity.setValue(1);
+      this.state.y.setValue(-NAV_HEIGHT);
+
+      Animated.timing(this.state.y, {
+        toValue: 0,
+        duration: 100,
+      }).start();
     }
   }
 
@@ -157,15 +157,15 @@ export default class NavBar extends React.Component {
         toValue: 0,
         duration: 200,
       }).start(() => {
-        this.setState({
-          y: new Animated.Value(-NAV_HEIGHT),
-        })
+        this.state.y.setValue(-NAV_HEIGHT);
       });
     } else if (type === 'slide') {
       Animated.timing(this.state.y, {
         toValue: -NAV_HEIGHT,
         duration: 100,
-      }).start();
+      }).start(() => {
+        this.state.opacity.setValue(0);
+      });
     }
   }
 
