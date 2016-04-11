@@ -159,15 +159,22 @@ export default class YANavigator extends React.Component {
                 // tell navBar to render back button
                 const prevRoute = state.routeStack[index - 1];
                 const previousComponent = prevRoute.component;
-                const previousNavigationDelegate =
-                  getNavigationDelegate(state.routeStack[index - 1].component);
+                const previousNavigationDelegate = getNavigationDelegate(previousComponent);
+
+                let backBtnText = '';
+
+                if (previousNavigationDelegate) {
+                  if (typeof previousNavigationDelegate.backBtnText === 'string') {
+                    backBtnText = previousNavigationDelegate.backBtnText;
+                  } else if (previousNavigationDelegate.getNavBarTitle) {
+                    backBtnText =
+                      previousNavigationDelegate.getNavBarTitle(prevRoute.props || {}).text
+                  }
+                }
 
                 return {
                   isBackBtn: true,
-                  text: (previousNavigationDelegate &&
-                    (previousNavigationDelegate.backBtnText) ||
-                    (previousNavigationDelegate.getNavBarTitle &&
-                    previousNavigationDelegate.getNavBarTitle(prevRoute.props || {}).text)) || '',
+                  text: backBtnText,
                   textStyle: leftBtnStyle,
                 }
               }
