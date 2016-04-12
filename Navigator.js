@@ -172,9 +172,9 @@ export default class YANavigator extends React.Component {
                   }
                 }
 
-                const navigationDelegate =
+                const navigationDelegate = state.routeStack[index] &&
                   getNavigationDelegate(state.routeStack[index].component);
-
+                
                 return {
                   isBackBtn: true,
                   text: backBtnText,
