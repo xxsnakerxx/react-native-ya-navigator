@@ -172,14 +172,18 @@ export default class YANavigator extends React.Component {
                   }
                 }
 
+                const navigationDelegate =
+                  getNavigationDelegate(state.routeStack[index].component);
+
                 return {
                   isBackBtn: true,
                   text: backBtnText,
                   textStyle: leftBtnStyle,
+                  onPress: navigationDelegate && navigationDelegate.overrideBackBtnPress ?
+                    this._emitNavBarLeftBtnPress.bind(this, route) : navigator.pop
                 }
               }
             }
-
 
             return LeftBtn;
           },

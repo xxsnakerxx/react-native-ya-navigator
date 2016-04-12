@@ -151,6 +151,13 @@ class MyScene extends React.Component {
     onAndroidBackPress(navigator) {
       navigator.popToPop();
     }
+    /**
+     * If it's true, onNavBarLeftBtnPress method will be called on backBtnPress instead
+     * of navigator.pop()
+     * false by default
+     * @type {bool}
+     */
+    overrideBackBtnPress: true|false,
   }
 }
 ```

@@ -300,7 +300,7 @@ export default class NavBar extends React.Component {
           ]}>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={navigator.pop}>
+            onPress={leftBtn.onPress}>
             {backIcon ||
               <Ionicon
                 style={styles.backBtnIcon}
@@ -364,7 +364,7 @@ export default class NavBar extends React.Component {
           ]}>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={navigator.pop}>
+            onPress={prevLeftBtn.onPress}>
             {backIcon ||
               <Ionicon
                 style={styles.backBtnIcon}
