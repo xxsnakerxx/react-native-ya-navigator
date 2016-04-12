@@ -2,7 +2,7 @@ import React from 'react-native';
 
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
-import { getNavigationDelegate } from './utils';
+import { getNavigationDelegate, getOrientation } from './utils';
 
 const {
   View,
@@ -23,9 +23,8 @@ const NAV_BAR_DEFAULT_BACKGROUND_COLOR = 'white';
 const NAV_BAR_DEFAULT_TINT_COLOR = 'black';
 const NAV_HEIGHT = NAV_BAR_STYLES.General.TotalNavHeight;
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const LEFT_PART_WIDTH = IS_IOS ? SCREEN_WIDTH / 4 : 48;
-const RIGHT_PART_WIDTH = SCREEN_WIDTH / (IS_IOS ? 4 : 3);
-const TITLE_PART_WIDTH = SCREEN_WIDTH - LEFT_PART_WIDTH - RIGHT_PART_WIDTH;
+const NAVBAR_LANDSCAPE_HEIGHT_IOS = 32;
+const NAVBAR_LANDSCAPE_HEIGHT_ANDROID = 40;
 const DEFAULT_IOS_BACK_ICON = 'ios-arrow-back';
 const DEFAULT_ANDROID_BACK_ICON = 'android-arrow-back';
 
@@ -42,6 +41,9 @@ export default class NavBar extends React.Component {
       prevTitleXPos: 0,
       prevTitleWidth: 0,
       backIconWidth: 0,
+      width: SCREEN_WIDTH,
+      height: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
+        (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
     }
   }
 
@@ -183,6 +185,16 @@ export default class NavBar extends React.Component {
     })
   };
 
+  _onNavBarLayout = (e) => {
+    const { layout } = e.nativeEvent;
+
+    this.setState({
+      width: layout.width,
+      height: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
+        (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
+    });
+  };
+
   render() {
     const {
       style,
@@ -198,10 +210,16 @@ export default class NavBar extends React.Component {
       animationProgress,
       y,
       opacity,
+      width,
+      height,
       prevTitleXPos,
       prevTitleWidth,
       backIconWidth,
     } = this.state;
+
+    const leftPartWidth = IS_IOS ? width / 4 : 48;
+    const rightPartWidth = width / (IS_IOS ? 4 : 3);
+    const titlePartWidth = width - leftPartWidth - rightPartWidth;
 
     const routeStack = navState.routeStack;
 
@@ -264,7 +282,9 @@ export default class NavBar extends React.Component {
       DEFAULT_IOS_BACK_ICON :
       DEFAULT_ANDROID_BACK_ICON;
 
-    const backIconSize = IS_IOS ? 32 : 24;
+    const backIconSize = IS_IOS ?
+      (getOrientation() === 'PORTRAIT' ? 32 : 26) :
+      24;
 
     if (leftBtn && leftBtn.isBackBtn) {
       backBtn = (
@@ -305,8 +325,8 @@ export default class NavBar extends React.Component {
                         translateX: animationProgress.interpolate({
                           inputRange: [0, 1],
                           outputRange: isGoingBack ?
-                            [2, LEFT_PART_WIDTH + prevTitleXPos - (backIconWidth + 10 + 2)] :
-                            [LEFT_PART_WIDTH + prevTitleXPos - (backIconWidth + 10 + 2), 2],
+                            [2, leftPartWidth + prevTitleXPos - (backIconWidth + 10 + 2)] :
+                            [leftPartWidth + prevTitleXPos - (backIconWidth + 10 + 2), 2],
                         }),
                       },
                     ],
@@ -368,7 +388,7 @@ export default class NavBar extends React.Component {
                       {
                         translateX: animationProgress.interpolate({
                           inputRange: [0, 1],
-                          outputRange: isGoingBack ? [-LEFT_PART_WIDTH, 2] : [2, -LEFT_PART_WIDTH / 2],
+                          outputRange: isGoingBack ? [-leftPartWidth, 2] : [2, -leftPartWidth / 2],
                         }),
                       },
                     ],
@@ -389,11 +409,16 @@ export default class NavBar extends React.Component {
 
     return (
       <Animated.View
+        onLayout={this._onNavBarLayout}
         style={[
           style,
           styles.navBar,
           navBarBackgroundColorStyle,
           {
+            height,
+            paddingTop: getOrientation() === 'PORTRAIT' ?
+              NAV_BAR_STYLES.General.StatusBarHeight :
+              0,
             opacity: isGoingBack &&
                     getNavigationDelegate(prevRoute.component) &&
                     getNavigationDelegate(prevRoute.component).navBarIsHidden ?
@@ -411,7 +436,16 @@ export default class NavBar extends React.Component {
         ]}>
 
         <View
-          style={styles.titleContainer}>
+          style={[
+            styles.titleContainer,
+            {
+              left: IS_IOS ? (width - titlePartWidth) / 2 : leftPartWidth + 10,
+              width: titlePartWidth,
+              height: getOrientation() === 'PORTRAIT' ?
+                height - NAV_BAR_STYLES.General.StatusBarHeight :
+                height,
+            },
+          ]}>
             <Animated.View
               style={[
                 styles.animatedWrapper,
@@ -423,8 +457,8 @@ export default class NavBar extends React.Component {
                         inputRange: [0, 1],
                         outputRange:
                           isGoingBack ?
-                            [-(LEFT_PART_WIDTH + ((TITLE_PART_WIDTH - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0] :
-                            [0, -(LEFT_PART_WIDTH + ((TITLE_PART_WIDTH - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)],
+                            [-(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0] :
+                            [0, -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)],
                       }),
                     },
                   ] : [],
@@ -453,8 +487,8 @@ export default class NavBar extends React.Component {
                         inputRange: [0, 1],
                         outputRange:
                           isGoingBack ?
-                            [0, (LEFT_PART_WIDTH + ((TITLE_PART_WIDTH - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)] :
-                            [(LEFT_PART_WIDTH + ((TITLE_PART_WIDTH - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0],
+                            [0, (leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)] :
+                            [(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0],
                       }),
                     },
                   ] : [],
@@ -470,7 +504,15 @@ export default class NavBar extends React.Component {
         </View>
 
         <View
-          style={styles.navBarLeftPartContainer}>
+          style={[
+            styles.navBarLeftPartContainer,
+            {
+              width: leftPartWidth,
+              height: getOrientation() === 'PORTRAIT' ?
+                height - NAV_BAR_STYLES.General.StatusBarHeight :
+                height,
+            },
+          ]}>
           {prevLeftBtn ?
             <Animated.View
               style={[
@@ -510,7 +552,15 @@ export default class NavBar extends React.Component {
         </View>
 
         <View
-          style={styles.navBarRightPartContainer}>
+          style={[
+            styles.navBarRightPartContainer,
+            {
+              width: rightPartWidth,
+              height: getOrientation() === 'PORTRAIT' ?
+                height - NAV_BAR_STYLES.General.StatusBarHeight :
+                height,
+            },
+          ]}>
           {prevRightBtn ?
             <Animated.View
               style={[
@@ -570,16 +620,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    width: SCREEN_WIDTH,
-    height: NAV_BAR_STYLES.General.TotalNavHeight,
-    paddingTop: NAV_BAR_STYLES.General.StatusBarHeight,
+    right: 0,
     flexDirection: 'row',
   },
   titleContainer: {
     position: 'absolute',
-    left: IS_IOS ? (SCREEN_WIDTH - TITLE_PART_WIDTH) / 2 : LEFT_PART_WIDTH + 10,
-    width: TITLE_PART_WIDTH,
-    height: NAV_BAR_STYLES.General.NavBarHeight,
   },
   animatedWrapper: {
     position: 'absolute',
@@ -594,13 +639,11 @@ const styles = StyleSheet.create({
   navBarLeftPartContainer: {
     position: 'absolute',
     left: 10,
-    width: LEFT_PART_WIDTH,
     height: NAV_BAR_STYLES.General.NavBarHeight,
   },
   navBarRightPartContainer: {
     position: 'absolute',
     right: 10,
-    width: RIGHT_PART_WIDTH,
     height: NAV_BAR_STYLES.General.NavBarHeight,
   },
   backBtn: {
