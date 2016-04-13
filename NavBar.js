@@ -256,7 +256,7 @@ export default class NavBar extends React.Component {
     const prevRoute =
       navState.routeStack[isGoingBack ? animationToIndex : animationFromIndex];
 
-    let title = route && routeMapper.Title(route || prevRoute) || null;
+    const title = route && routeMapper.Title(route || prevRoute) || null;
     const prevTitle = prevRoute && routeMapper.Title(prevRoute || route) || null;
 
     let leftBtn =
@@ -320,6 +320,7 @@ export default class NavBar extends React.Component {
                   styles.backBtnText,
                   leftBtn.textStyle,
                   {
+                    width: leftPartWidth - backIconWidth - 10 - 2 - 20,
                     transform: [
                       {
                         translateX: animationProgress.interpolate({
@@ -384,6 +385,7 @@ export default class NavBar extends React.Component {
                   styles.backBtnText,
                   prevLeftBtn.textStyle,
                   {
+                    width: leftPartWidth - backIconWidth - 10 - 2 - 20,
                     transform: [
                       {
                         translateX: animationProgress.interpolate({
@@ -450,7 +452,6 @@ export default class NavBar extends React.Component {
               style={[
                 styles.animatedWrapper,
                 {
-                  justifyContent: IS_IOS ? 'center' : 'flex-start',
                   transform: IS_IOS ? [
                     {
                       translateX: animationProgress.interpolate({
@@ -469,12 +470,14 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {IS_IOS ?
-                <View onLayout={this._onPrevTitleLayout}>
-                  {prevTitle}
-                </View> :
-                prevTitle
-              }
+              <View
+                onLayout={IS_IOS ? this._onPrevTitleLayout : null}
+                style={{
+                  width: titlePartWidth,
+                  alignItems: IS_IOS ? 'center' : 'flex-start',
+                }}>
+                {prevTitle}
+              </View>
             </Animated.View>
             <Animated.View
               style={[
@@ -499,7 +502,13 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {title}
+              <View
+                style={{
+                  width: titlePartWidth,
+                  alignItems: IS_IOS ? 'center' : 'flex-start',
+                }}>
+                {title}
+              </View>
             </Animated.View>
         </View>
 
@@ -518,7 +527,6 @@ export default class NavBar extends React.Component {
               style={[
                 styles.animatedWrapper,
                 {
-                  justifyContent: 'flex-start',
                   opacity: animationProgress.interpolate({
                     inputRange: [0, 1],
                     outputRange: isGoingBack ? [0, 1] : [1, 0],
@@ -526,7 +534,13 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {prevLeftBtn}
+              <View
+                style={{
+                  width: leftPartWidth,
+                  alignItems: 'flex-start',
+                }}>
+                {prevLeftBtn}
+              </View>
             </Animated.View> :
             null
           }
@@ -535,7 +549,6 @@ export default class NavBar extends React.Component {
               style={[
                 styles.animatedWrapper,
                 {
-                  justifyContent: 'flex-start',
                   opacity: animationProgress.interpolate({
                     inputRange: [0, 1],
                     outputRange: isGoingBack ? [1, 0] : [0, 1],
@@ -543,7 +556,13 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {leftBtn}
+              <View
+                style={{
+                  width: leftPartWidth,
+                  alignItems: 'flex-start',
+                }}>
+                {leftBtn}
+              </View>
             </Animated.View> :
             null
           }
@@ -566,7 +585,6 @@ export default class NavBar extends React.Component {
               style={[
                 styles.animatedWrapper,
                 {
-                  justifyContent: 'flex-end',
                   opacity: animationProgress.interpolate({
                     inputRange: [0, 1],
                     outputRange: isGoingBack ? [0, 1] : [1, 0],
@@ -574,7 +592,13 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {prevRightBtn}
+              <View
+                style={{
+                  width: rightPartWidth,
+                  alignItems: 'flex-end',
+                }}>
+                {prevRightBtn}
+              </View>
             </Animated.View> :
             null
           }
@@ -583,7 +607,6 @@ export default class NavBar extends React.Component {
               style={[
                 styles.animatedWrapper,
                 {
-                  justifyContent: 'flex-end',
                   opacity: animationProgress.interpolate({
                     inputRange: [0, 1],
                     outputRange: isGoingBack ? [1, 0] : [0, 1],
@@ -591,7 +614,13 @@ export default class NavBar extends React.Component {
                 },
               ]}
             >
-              {rightBtn}
+              <View
+                style={{
+                  width: rightPartWidth,
+                  alignItems: 'flex-end',
+                }}>
+                {rightBtn}
+              </View>
             </Animated.View> :
             null
           }
