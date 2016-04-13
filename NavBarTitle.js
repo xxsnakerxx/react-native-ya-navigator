@@ -18,7 +18,7 @@ export default class NavBarTitle extends React.Component {
       onPress,
     } = this.props;
 
-    if (text) {
+    if (text !== undefined) {
       child = (
         <Text
           allowFontScaling={false}
