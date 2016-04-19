@@ -471,12 +471,14 @@ export default class NavBar extends React.Component {
               ]}
             >
               <View
-                onLayout={IS_IOS ? this._onPrevTitleLayout : null}
                 style={{
                   width: titlePartWidth,
                   alignItems: IS_IOS ? 'center' : 'flex-start',
                 }}>
-                {prevTitle}
+                <View
+                  onLayout={IS_IOS ? this._onPrevTitleLayout : null}>
+                  {prevTitle}
+                </View>
               </View>
             </Animated.View>
             <Animated.View
