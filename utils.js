@@ -15,7 +15,7 @@ const replaceInstanceEventedProps =
   (reactElement, eventedProps, events = [], route, navigationContext) => {
 
   eventedProps.forEach((eventedProp) => {
-    if (reactElement.props[eventedProp]) {
+    if (React.isValidElement(reactElement) && reactElement.props[eventedProp]) {
       const event = reactElement.props[eventedProp]();
 
       if (typeof event === 'string') {
