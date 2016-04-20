@@ -56,7 +56,7 @@ class App extends React.Component {
   - `initialRoute`
   - `defaultSceneConfig` (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
 and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
-  - `useNavigationBar` (useful if you want to render your navBar component on each scene ([ToolbarAndroid](https://facebook.github.io/react-native/docs/toolbarandroid.html#content) for example)) instead of the embedded navBar)
+  - `useNavigationBar` (useful if you want to render your navBar component on each scene ([ToolbarAndroid](https://facebook.github.io/react-native/docs/toolbarandroid.html#content) for example) instead of the embedded navBar)
   - `navBarUnderlay` (the view that will be rendered under all navBar items ([react-native-blur](https://github.com/react-native-fellowship/react-native-blur) for example))
   - `navBarBackBtn`
     - `icon`
@@ -164,7 +164,7 @@ Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__defau
 
 There are a few simple rules
 
-- if you pass as navBar item just a `class`, it should have `propTypes` with prop that you want to listen, then you should define method that will be called (`onNavBarTitlePress`, 'onNavBarLeftPartPress', `onNavBarRightPartPress`, 'onNavBarTitleChange', 'onNavBarTitleValueChange', etc...)
+- if you pass as navBar item just a `class`, it should have `propTypes` with prop that you want to listen, then you should define method that will be called (`onNavBarTitlePress`, `onNavBarLeftPartPress`, `onNavBarRightPartPress`, `onNavBarTitleChange`, `onNavBarTitleValueChange`, etc...)
 - if you pass as navBar item `JSX`, then props that you want to listen should return just a string - __name of the delegate method that will be called__
 - currently supported props `onPress`, `onChange`, `onValueChange`
 
