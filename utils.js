@@ -1,4 +1,4 @@
-import { Dimensions } from 'react-native';
+import React,{ Dimensions } from 'react-native';
 
 const getNavigationDelegate = (component) => {
   return component.navigationDelegate ||
@@ -11,7 +11,30 @@ const getOrientation = () => {
   return height > width ? 'PORTRAIT' : 'LANDSCAPE';
 }
 
+const replaceInstanceEventedProps =
+  (reactElement, eventedProps, events = [], route, navigationContext) => {
+
+  eventedProps.forEach((eventedProp) => {
+    if (reactElement.props[eventedProp]) {
+      const event = reactElement.props[eventedProp]();
+
+      if (typeof event === 'string') {
+        if (!events.includes(event)) {
+          events.push(event)
+        }
+
+        reactElement = React.cloneElement(reactElement, {
+          [eventedProp]: (e) => navigationContext.emit(event, {route, e}),
+        })
+      }
+    }
+  })
+
+  return {reactElement, events};
+}
+
 export {
   getNavigationDelegate,
   getOrientation,
+  replaceInstanceEventedProps,
 }

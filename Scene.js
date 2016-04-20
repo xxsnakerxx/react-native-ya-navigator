@@ -1,11 +1,8 @@
 import React from 'react-native';
 
-import * as constants from './constants';
-
 const {
   View,
   Navigator,
-  StyleSheet,
   PropTypes,
 } = React;
 
@@ -13,54 +10,49 @@ export default class Scene extends React.Component {
   componentDidMount() {
     const { delegate } = this.props;
 
-    if (delegate &&
-        delegate.constructor.navigationDelegate &&
-        delegate.constructor.navigationDelegate.id) {
+    if (delegate) {
+      const navigationDelegate = delegate.constructor.navigationDelegate;
 
-      const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate);
+      if (navigationDelegate && navigationDelegate.id) {
+        const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate, {
+          _events: undefined,
+        });
 
-      const navigationContext = delegate.props.navigator.navigationContext;
-      const delegateId = delegate.constructor.navigationDelegate.id;
+        const navigationContext = delegate.props.navigator.navigationContext;
+        const delegateId = delegate.constructor.navigationDelegate.id;
 
-      this._onTitlePressSub = navigationContext.addListener(
-        constants.TITLE_PRESS_EVENT,
-        ({data: {route}}) => {
-          delegateId ===
-          route.component.navigationDelegate.id ?
-            (delegate.onNavBarTitlePress ? delegate.onNavBarTitlePress() : () => {}) :
-            null
+        setTimeout(() => {
+          const events = delegate.constructor.navigationDelegate._events;
+
+          if (events && events.length) {
+            events.forEach((eventName) => {
+              this[`_${eventName}Sub`] = navigationContext.addListener(
+                eventName,
+                ({data: {route, e}}) => {
+                  delegateId ===
+                  route.component.navigationDelegate.id ?
+                    (delegate[eventName] ? delegate[eventName](e) : () => {}) :
+                    null
+                }
+              );
+            });
+          }
+        }, 300);
+
+        const delegateUnmountHandler = delegate.componentWillUnmount;
+
+        delegate.componentWillUnmount = () => {
+          delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
+
+          const events = delegate.constructor.navigationDelegate._events;
+
+          if (events && events.length) {
+            this._removeSubs();
+          }
+
+          // restore here because we might change it by navBar.updateUI etc...
+          delegate.constructor.navigationDelegate = navigationDelegateCopy;
         }
-      );
-
-      this._onLeftBtnPressSub = navigationContext.addListener(
-        constants.LEFT_BTN_PRESS_EVENT,
-        ({data: {route}}) => {
-          delegateId ===
-          route.component.navigationDelegate.id ?
-            (delegate.onNavBarLeftBtnPress ? delegate.onNavBarLeftBtnPress() : () => {}) :
-            null
-        }
-      );
-
-      this._onRightBtnPressSub = navigationContext.addListener(
-        constants.RIGHT_BTN_PRESS_EVENT,
-        ({data: {route}}) => {
-          delegateId ===
-          route.component.navigationDelegate.id ?
-            (delegate.onNavBarRightBtnPress ? delegate.onNavBarRightBtnPress() : () => {}) :
-            null
-        }
-      );
-
-      const delegateUnmountHandler = delegate.componentWillUnmount;
-
-      delegate.componentWillUnmount = () => {
-        delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
-
-        this._removeSubs();
-
-        // restore here because we might change it by navBar.setTitle etc...
-        delegate.constructor.navigationDelegate = navigationDelegateCopy;
       }
     }
   }
@@ -69,9 +61,14 @@ export default class Scene extends React.Component {
     const { delegate } = this.props;
 
     if (delegate) {
-      this._onTitlePressSub.remove();
-      this._onLeftBtnPressSub.remove();
-      this._onRightBtnPressSub.remove();
+      const events = delegate.constructor.navigationDelegate._events;
+
+      if (events) {
+        events.forEach((eventName) => {
+          this[`_${eventName}Sub`].remove();
+          this[`_${eventName}Sub`] = null;
+        });
+      }
     }
   }
 

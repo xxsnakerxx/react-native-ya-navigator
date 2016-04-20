@@ -51,61 +51,36 @@ export default class NavBar extends React.Component {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
     const routeProps = currentRoute.props || {};
-    const oldTitle =
-      navigationDelegate &&
-      navigationDelegate.getNavBarTitle &&
-      navigationDelegate.getNavBarTitle(routeProps);
 
-    if (oldTitle) {
-      let newTitle = null;
-
-      if (typeof oldTitle === 'object') {
-        if (React.isValidElement(oldTitle)) {
-          newTitle = React.cloneElement(oldTitle, {
-            text: title,
-            title,
-          });
-
-          navigationDelegate
-            .getNavBarTitle = (routeProps) => newTitle;
-        } else {
-          navigationDelegate
-            .getNavBarTitle = (routeProps) => Object.assign({}, oldTitle, {
-              text: title,
-            });
-        }
-      }
-    } else {
-      if (navigationDelegate) {
-        navigationDelegate.getNavBarTitle = (routeProps) => title;
-      }
+    if (navigationDelegate) {
+      navigationDelegate.renderTitle = (routeProps) => title;
     }
   }
 
-  _setLeftBtn(btn) {
+  _setLeftPart(part) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
     const routeProps = currentRoute.props || {};
 
     if (navigationDelegate) {
-      navigationDelegate.getNavBarLeftBtn = (routeProps) => btn;
+      navigationDelegate.renderNavBarLeftPart = (routeProps) => part;
     }
   }
 
-  _setRightBtn(btn) {
+  _setRightPart(part) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
     const routeProps = currentRoute.props || {};
 
     if (navigationDelegate) {
-      navigationDelegate.getNavBarRightBtn = (routeProps) => btn;
+      navigationDelegate.renderNavBarRightPart = (routeProps) => part;
     }
   }
 
   updateUI(ui) {
     ui.title !== undefined && this._setTitle(ui.title);
-    ui.leftBtn !== undefined && this._setLeftBtn(ui.leftBtn);
-    ui.rightBtn !== undefined && this._setRightBtn(ui.rightBtn);
+    ui.leftPart !== undefined && this._setLeftPart(ui.leftPart);
+    ui.rightPart !== undefined && this._setRightPart(ui.rightPart);
 
     this.forceUpdate();
   }
@@ -217,6 +192,23 @@ export default class NavBar extends React.Component {
       backIconWidth,
     } = this.state;
 
+    let underlay = this.props.underlay;
+
+    if (React.isValidElement(underlay)) {
+      underlay = React.cloneElement(underlay, {
+        style: {
+          ...underlay.props.style,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+      })
+    } else {
+      underlay = null;
+    }
+
     const leftPartWidth = IS_IOS ? width / 4 : 48;
     const rightPartWidth = width / (IS_IOS ? 4 : 3);
     const titlePartWidth = width - leftPartWidth - rightPartWidth;
@@ -256,19 +248,21 @@ export default class NavBar extends React.Component {
     const prevRoute =
       navState.routeStack[isGoingBack ? animationToIndex : animationFromIndex];
 
-    const title = route && routeMapper.Title(route || prevRoute) || null;
-    const prevTitle = prevRoute && routeMapper.Title(prevRoute || route) || null;
+    const title =
+      route && routeMapper.Title((route || prevRoute), navigator) || null;
+    const prevTitle =
+      prevRoute && routeMapper.Title((prevRoute || route), navigator) || null;
 
-    let leftBtn =
-      route && routeMapper.LeftButton(
+    let leftPart =
+      route && routeMapper.LeftPart(
         route || prevRoute,
         navigator,
         isGoingBack ? animationFromIndex : animationToIndex,
         navState
       ) || null;
 
-    let prevLeftBtn =
-      prevRoute && routeMapper.LeftButton(
+    let prevLeftPart =
+      prevRoute && routeMapper.LeftPart(
         prevRoute || route,
         navigator,
         (isGoingBack ? animationFromIndex : animationToIndex) - 1,
@@ -286,7 +280,7 @@ export default class NavBar extends React.Component {
       (getOrientation() === 'PORTRAIT' ? 32 : 26) :
       24;
 
-    if (leftBtn && leftBtn.isBackBtn) {
+    if (leftPart && leftPart.isBackBtn) {
       backBtn = (
         <Animated.View
           style={[
@@ -300,7 +294,7 @@ export default class NavBar extends React.Component {
           ]}>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={leftBtn.onPress}>
+            onPress={leftPart.onPress}>
             {backIcon ||
               <Ionicon
                 style={styles.backBtnIcon}
@@ -308,8 +302,7 @@ export default class NavBar extends React.Component {
                 name={backIconName}
                 size={backIconSize}
                 color={
-                  leftBtn.textStyle &&
-                  leftBtn.textStyle.color ||
+                  leftPart.textStyle.color ||
                   NAV_BAR_DEFAULT_TINT_COLOR} />
             }
             {IS_IOS &&
@@ -318,9 +311,9 @@ export default class NavBar extends React.Component {
                 allowFontScaling={false}
                 style={[
                   styles.backBtnText,
-                  leftBtn.textStyle,
+                  leftPart.textStyle,
                   {
-                    width: leftPartWidth - backIconWidth - 10 - 2 - 20,
+                    width: leftPartWidth - backIconWidth - 10 - 2 - 10,
                     transform: [
                       {
                         translateX: animationProgress.interpolate({
@@ -333,17 +326,17 @@ export default class NavBar extends React.Component {
                     ],
                   },
                 ]}>
-                {leftBtn.text}
+                {leftPart.text}
               </Animated.Text>
             }
           </TouchableOpacity>
         </Animated.View>
       )
 
-      leftBtn = null;
+      leftPart = null;
     }
 
-    if (prevLeftBtn && prevLeftBtn.isBackBtn) {
+    if (prevLeftPart && prevLeftPart.isBackBtn) {
       prevBackBtn = (
         <Animated.View
           style={[
@@ -365,7 +358,7 @@ export default class NavBar extends React.Component {
           ]}>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={prevLeftBtn.onPress}>
+            onPress={prevLeftPart.onPress}>
             {backIcon ||
               <Ionicon
                 style={styles.backBtnIcon}
@@ -373,8 +366,7 @@ export default class NavBar extends React.Component {
                 name={backIconName}
                 size={backIconSize}
                 color={
-                  prevLeftBtn.textStyle &&
-                  prevLeftBtn.textStyle.color ||
+                  prevLeftPart.textStyle.color ||
                   NAV_BAR_DEFAULT_TINT_COLOR} />
             }
             {IS_IOS &&
@@ -383,9 +375,9 @@ export default class NavBar extends React.Component {
                 allowFontScaling={false}
                 style={[
                   styles.backBtnText,
-                  prevLeftBtn.textStyle,
+                  prevLeftPart.textStyle,
                   {
-                    width: leftPartWidth - backIconWidth - 10 - 2 - 20,
+                    width: leftPartWidth - backIconWidth - 10 - 2 - 10,
                     transform: [
                       {
                         translateX: animationProgress.interpolate({
@@ -396,18 +388,20 @@ export default class NavBar extends React.Component {
                     ],
                   },
                 ]}>
-                {prevLeftBtn.text}
+                {prevLeftPart.text}
               </Animated.Text>
             }
           </TouchableOpacity>
         </Animated.View>
       )
 
-      prevLeftBtn = null;
+      prevLeftPart = null;
     }
 
-    let rightBtn = route && routeMapper.RightButton(route || prevRoute) || null;
-    let prevRightBtn = prevRoute && routeMapper.RightButton(prevRoute || route) || null;
+    let rightPart =
+      route && routeMapper.RightPart((route || prevRoute), navigator) || null;
+    let prevRightPart =
+      prevRoute && routeMapper.RightPart((prevRoute || route), navigator) || null;
 
     return (
       <Animated.View
@@ -436,7 +430,7 @@ export default class NavBar extends React.Component {
             ],
           },
         ]}>
-
+        {underlay}
         <View
           style={[
             styles.titleContainer,
@@ -524,7 +518,7 @@ export default class NavBar extends React.Component {
                 height,
             },
           ]}>
-          {prevLeftBtn ?
+          {prevLeftPart ?
             <Animated.View
               style={[
                 styles.animatedWrapper,
@@ -541,12 +535,12 @@ export default class NavBar extends React.Component {
                   width: leftPartWidth,
                   alignItems: 'flex-start',
                 }}>
-                {prevLeftBtn}
+                {prevLeftPart}
               </View>
             </Animated.View> :
             null
           }
-          {leftBtn && animationFromIndex !== animationToIndex ?
+          {leftPart && animationFromIndex !== animationToIndex ?
             <Animated.View
               style={[
                 styles.animatedWrapper,
@@ -563,7 +557,7 @@ export default class NavBar extends React.Component {
                   width: leftPartWidth,
                   alignItems: 'flex-start',
                 }}>
-                {leftBtn}
+                {leftPart}
               </View>
             </Animated.View> :
             null
@@ -582,7 +576,7 @@ export default class NavBar extends React.Component {
                 height,
             },
           ]}>
-          {prevRightBtn ?
+          {prevRightPart ?
             <Animated.View
               style={[
                 styles.animatedWrapper,
@@ -599,12 +593,12 @@ export default class NavBar extends React.Component {
                   width: rightPartWidth,
                   alignItems: 'flex-end',
                 }}>
-                {prevRightBtn}
+                {prevRightPart}
               </View>
             </Animated.View> :
             null
           }
-          {rightBtn && animationFromIndex !== animationToIndex ?
+          {rightPart && animationFromIndex !== animationToIndex ?
             <Animated.View
               style={[
                 styles.animatedWrapper,
@@ -621,7 +615,7 @@ export default class NavBar extends React.Component {
                   width: rightPartWidth,
                   alignItems: 'flex-end',
                 }}>
-                {rightBtn}
+                {rightPart}
               </View>
             </Animated.View> :
             null
@@ -638,10 +632,11 @@ export default class NavBar extends React.Component {
     navState: Navigator.NavigationBar.propTypes.navState,
     routeMapper: PropTypes.shape({
       Title: PropTypes.func.isRequired,
-      LeftButton: PropTypes.func.isRequired,
-      RightButton: PropTypes.func.isRequired,
+      LeftPart: PropTypes.func.isRequired,
+      RightPart: PropTypes.func.isRequired,
       navBarBackgroundColor: PropTypes.func.isRequired,
     }).isRequired,
+    underlay: PropTypes.object,
     backIcon: PropTypes.object,
   };
 }
@@ -666,6 +661,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    backgroundColor: 'transparent',
   },
   navBarLeftPartContainer: {
     position: 'absolute',

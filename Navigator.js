@@ -1,15 +1,9 @@
 import React from 'react-native';
-import omit from 'lodash.omit';
 
 import NavBar from './NavBar';
-import NavBarTitle from './NavBarTitle';
-import NavBarBtn from './NavBarBtn';
-
 import Scene from './Scene';
 
-import { getNavigationDelegate } from './utils';
-
-import * as constants from './constants';
+import { getNavigationDelegate, replaceInstanceEventedProps } from './utils';
 
 const {
   View,
@@ -20,8 +14,7 @@ const {
   BackAndroid,
 } = React;
 
-const validTextStyles =
-  Object.keys(require('react-native/Libraries/Text/TextStylePropTypes'));
+const VALID_EVENTED_PROPS = ['onPress', 'onValueChange', 'onChange'];
 
 export default class YANavigator extends React.Component {
   componentDidMount() {
@@ -52,6 +45,7 @@ export default class YANavigator extends React.Component {
   componentWillUnmount() {
     if (Platform.OS === 'android') {
       this._backPressSub.remove();
+      this._backPressSub = null;
     }
   }
 
@@ -84,20 +78,17 @@ export default class YANavigator extends React.Component {
 
   _renderNavigationBar(
     navBarStyle,
-    navBarComponentsDefaultStyles = {},
     isHiddenOnInit,
-    navBarBackIcon
+    navBarBackBtn,
+    navBarUnderlay,
   ) {
-
-    const titleStyle = navBarComponentsDefaultStyles.title;
-    const leftBtnStyle = navBarComponentsDefaultStyles.leftBtn;
-    const rightBtnStyle = navBarComponentsDefaultStyles.rightBtn;
 
     return (
       <NavBar
         isHiddenOnInit={isHiddenOnInit}
         style={navBarStyle}
-        backIcon={navBarBackIcon}
+        backIcon={navBarBackBtn.icon}
+        underlay={navBarUnderlay}
         routeMapper={{
           navBarBackgroundColor: (route) => {
             let navBarBackgroundColor = '';
@@ -114,45 +105,69 @@ export default class YANavigator extends React.Component {
             return navBarBackgroundColor;
           },
 
-          LeftButton: (route, navigator, index, state) => {
-            let LeftBtn = null;
+          LeftPart: (route, navigator, index, state) => {
+            let LeftPart = null;
 
             const navigationDelegate = getNavigationDelegate(route.component);
 
             if (navigationDelegate &&
-                navigationDelegate.getNavBarLeftBtn) {
+                navigationDelegate.renderNavBarLeftPart) {
 
-              LeftBtn = navigationDelegate.getNavBarLeftBtn(route.props || {});
+              navigationDelegate._events = navigationDelegate._events || [];
 
-              if (!LeftBtn) return null;
+              LeftPart = navigationDelegate.renderNavBarLeftPart(route.props || {});
 
-              if (typeof LeftBtn === 'object') {
-                if (React.isValidElement(LeftBtn)) {
-                  const _leftBtnStyle = omit(leftBtnStyle, validTextStyles);
+              if (!LeftPart) return null;
 
-                  LeftBtn = React.createElement(NavBarBtn, {
-                    onPress: this._emitNavBarLeftBtnPress.bind(this, route),
-                    side: 'left',
-                    style: _leftBtnStyle,
-                  }, LeftBtn);
-                } else {
-                  LeftBtn = (
-                    <NavBarBtn
-                      onPress={this._emitNavBarLeftBtnPress.bind(this, route)}
-                      side={'left'}
-                      text={LeftBtn.text}
-                      textStyle={[leftBtnStyle, LeftBtn.style]}/>
+              if (typeof LeftPart === 'object' && React.isValidElement(LeftPart)) {
+                const children =
+                  React.Children.toArray(LeftPart.props.children).map((child) => {
+                    const {reactElement, events} =
+                      replaceInstanceEventedProps(
+                        child,
+                        VALID_EVENTED_PROPS,
+                        navigationDelegate._events,
+                        route,
+                        navigator.navigationContext
+                      )
+
+                    navigationDelegate._events = events;
+
+                    return reactElement
+                  })
+
+                const {reactElement, events} =
+                  replaceInstanceEventedProps(
+                    LeftPart,
+                    VALID_EVENTED_PROPS,
+                    navigationDelegate._events,
+                    route,
+                    navigator.navigationContext
                   )
-                }
-              } else if (typeof LeftBtn === 'function') {
-                const _leftBtnStyle = omit(leftBtnStyle, validTextStyles);
 
-                LeftBtn =
-                  (<NavBarBtn
-                    onPress={this._emitNavBarLeftBtnPress.bind(this, route)}
-                    style={_leftBtnStyle}>
-                      <LeftBtn />
-                  </NavBarBtn>)
+                navigationDelegate._events = events;
+                LeftPart = reactElement;
+
+                LeftPart = React.cloneElement(LeftPart, {
+                  ref: 'leftPart',
+                }, children)
+              } else if (typeof LeftPart === 'function') {
+                const props = {};
+
+                LeftPart.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                  if (LeftPart.propTypes[validProp]) {
+                    const event = `onNavBarLeftPart${validProp.replace(/^on/, '')}`
+
+                    if (!navigationDelegate._events.includes(event)) {
+                      navigationDelegate._events.push(event)
+                    }
+
+                    props[validProp] = (e) => navigator.navigationContext
+                      .emit(event, {route, e});
+                  }
+                })
+
+                LeftPart = <LeftPart ref={'leftPart'} {...props} />
               }
             } else {
               if (index > 0) {
@@ -163,103 +178,183 @@ export default class YANavigator extends React.Component {
 
                 let backBtnText = '';
 
-                if (previousNavigationDelegate) {
-                  if (typeof previousNavigationDelegate.backBtnText === 'string') {
-                    backBtnText = previousNavigationDelegate.backBtnText;
-                  } else if (previousNavigationDelegate.getNavBarTitle) {
-                    backBtnText =
-                      previousNavigationDelegate.getNavBarTitle(prevRoute.props || {}).text
-                  }
+                if (previousNavigationDelegate &&
+                    typeof previousNavigationDelegate.backBtnText === 'string') {
+
+                  backBtnText = previousNavigationDelegate.backBtnText;
                 }
 
                 const navigationDelegate = state.routeStack[index] &&
                   getNavigationDelegate(state.routeStack[index].component);
-                
-                return {
+
+                const backBtnConfig = {
                   isBackBtn: true,
                   text: backBtnText,
-                  textStyle: leftBtnStyle,
-                  onPress: navigationDelegate && navigationDelegate.overrideBackBtnPress ?
-                    this._emitNavBarLeftBtnPress.bind(this, route) : navigator.pop
+                  onPress: navigator.pop,
+                  textStyle: navBarBackBtn.textStyle,
                 }
+
+                if (navigationDelegate) {
+                  if (navigationDelegate.navBarBackBtnColor) {
+                    backBtnConfig.textStyle.color =
+                      navigationDelegate.navBarBackBtnColor;
+                  }
+
+                  if (navigationDelegate.overrideBackBtnPress) {
+                    navigationDelegate._events = navigationDelegate._events || [];
+
+                    const event = 'onNavBarBackBtnPress'
+
+                    if (!navigationDelegate._events.includes(event)) {
+                      navigationDelegate._events.push(event)
+                    }
+
+                    backBtnConfig.onPress = () => navigator.navigationContext
+                      .emit(event, {route});
+                  }
+                }
+
+                return backBtnConfig;
               }
             }
 
-            return LeftBtn;
+            return LeftPart;
           },
 
-          RightButton: (route) => {
-            let RightBtn = null;
+          RightPart: (route, navigator) => {
+            let RightPart = null;
 
             const navigationDelegate = getNavigationDelegate(route.component);
 
+            navigationDelegate._events = navigationDelegate._events || [];
+
             if (navigationDelegate &&
-                navigationDelegate.getNavBarRightBtn) {
+                navigationDelegate.renderNavBarRightPart) {
 
-              RightBtn = navigationDelegate.getNavBarRightBtn(route.props || {});
+              navigationDelegate._events = navigationDelegate._events || [];
 
-              if (!RightBtn) return null;
+              RightPart = navigationDelegate.renderNavBarRightPart(route.props || {});
 
-              if (typeof RightBtn === 'object') {
-                if (React.isValidElement(RightBtn)) {
-                  const _rightBtnStyle = omit(rightBtnStyle, validTextStyles);
+              if (!RightPart) return null;
 
-                  RightBtn = React.createElement(NavBarBtn, {
-                    onPress: this._emitNavBarRightBtnPress.bind(this, route),
-                    side: 'right',
-                    style: _rightBtnStyle,
-                  }, RightBtn);
-                } else {
-                  RightBtn = (
-                    <NavBarBtn
-                      onPress={this._emitNavBarRightBtnPress.bind(this, route)}
-                      side={'right'}
-                      text={RightBtn.text}
-                      textStyle={[rightBtnStyle, RightBtn.style]}/>
+              if (typeof RightPart === 'object' && React.isValidElement(RightPart)) {
+                const children =
+                  React.Children.toArray(RightPart.props.children).map((child) => {
+                    const {reactElement, events} =
+                      replaceInstanceEventedProps(
+                        child,
+                        VALID_EVENTED_PROPS,
+                        navigationDelegate._events,
+                        route,
+                        navigator.navigationContext
+                      )
+
+                    navigationDelegate._events = events;
+
+                    return reactElement
+                  })
+
+                const {reactElement, events} =
+                  replaceInstanceEventedProps(
+                    RightPart,
+                    VALID_EVENTED_PROPS,
+                    navigationDelegate._events,
+                    route,
+                    navigator.navigationContext
                   )
-                }
-              } else if (typeof RightBtn === 'function') {
-                const _rightBtnStyle = omit(rightBtnStyle, validTextStyles);
 
-                RightBtn =
-                  (<NavBarBtn
-                    onPress={this._emitNavBarRightBtnPress.bind(this, route)}
-                    style={_rightBtnStyle}>
-                    <RightBtn />
-                  </NavBarBtn>)
+                navigationDelegate._events = events;
+                RightPart = reactElement;
+
+                RightPart = React.cloneElement(RightPart, {
+                  ref: 'rightPart',
+                }, children)
+              } else if (typeof RightPart === 'function') {
+                const props = {};
+
+                RightPart.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                  if (RightPart.propTypes[validProp]) {
+                    const event = `onNavBarRightPart${validProp.replace(/^on/, '')}`
+
+                    if (!navigationDelegate._events.includes(event)) {
+                      navigationDelegate._events.push(event)
+                    }
+
+                    props[validProp] = (e) => navigator.navigationContext
+                      .emit(event, {route, e});
+                  }
+                })
+
+                RightPart = <RightPart ref={'rightPart'} {...props} />
               }
             }
 
-            return RightBtn;
+            return RightPart;
           },
 
-          Title: (route) => {
+          Title: (route, navigator) => {
             let Title = null;
 
             const navigationDelegate = getNavigationDelegate(route.component);
 
             if (navigationDelegate &&
-                navigationDelegate.getNavBarTitle) {
+                navigationDelegate.renderTitle) {
 
-              Title = navigationDelegate.getNavBarTitle(route.props || {});
+              navigationDelegate._events = navigationDelegate._events || [];
+
+              Title = navigationDelegate.renderTitle(route.props || {});
 
               if (!Title) return null;
 
-              if (typeof Title === 'object') {
-                if (React.isValidElement(Title)) {
-                  Title = React.cloneElement(Title, {
-                    onPress: Title.props.onPress ? this._emitNavBarTitlePress.bind(this, route) : null,
-                    style: [titleStyle, Title.props.style],
-                  });
-                } else {
-                  Title = (
-                    <NavBarTitle
-                      onPress={Title.touchable ? this._emitNavBarTitlePress.bind(this, route) : null}
-                      text={Title.text}
-                      textStyle={[titleStyle, Title.style]}
-                    />
+              if (typeof Title === 'object' && React.isValidElement(Title)) {
+                const children =
+                  React.Children.toArray(Title.props.children).map((child) => {
+                    const {reactElement, events} =
+                      replaceInstanceEventedProps(
+                        child,
+                        VALID_EVENTED_PROPS,
+                        navigationDelegate._events,
+                        route,
+                        navigator.navigationContext
+                      )
+
+                    navigationDelegate._events = events;
+
+                    return reactElement
+                  })
+
+                const {reactElement, events} =
+                  replaceInstanceEventedProps(
+                    Title,
+                    VALID_EVENTED_PROPS,
+                    navigationDelegate._events,
+                    route,
+                    navigator.navigationContext
                   )
-                }
+
+                navigationDelegate._events = events;
+                Title = reactElement;
+
+                Title = React.cloneElement(Title, {
+                  ref: 'title',
+                }, children)
+              } else if (typeof Title === 'function') {
+                const props = {};
+
+                Title.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                  if (Title.propTypes[validProp]) {
+                    const event = `onNavBarTitle${validProp.replace(/^on/, '')}`
+
+                    if (!navigationDelegate._events.includes(event)) {
+                      navigationDelegate._events.push(event)
+                    }
+
+                    props[validProp] = (e) => navigator.navigationContext
+                      .emit(event, {route, e});
+                  }
+                })
+
+                Title = <Title ref={'title'} {...props} />
               }
             }
 
@@ -282,30 +377,16 @@ export default class YANavigator extends React.Component {
     }
   };
 
-  _emitNavBarTitlePress = (route) => {
-    this.refs.navigator.navigationContext
-      .emit(constants.TITLE_PRESS_EVENT, {route})
-  };
-
-  _emitNavBarLeftBtnPress = (route) => {
-    this.refs.navigator.navigationContext
-      .emit(constants.LEFT_BTN_PRESS_EVENT, {route})
-  };
-
-  _emitNavBarRightBtnPress = (route) => {
-    this.refs.navigator.navigationContext
-      .emit(constants.RIGHT_BTN_PRESS_EVENT, {route})
-  };
-
   render() {
     const {
       initialRoute,
       defaultSceneConfig,
       navBarStyle,
-      navBarComponentsDefaultStyles,
       style,
       sceneStyle,
-      navBarBackIcon,
+      navBarBackBtn,
+      navBarUnderlay,
+      useNavigationBar,
     } = this.props;
 
     const navigationDelegate = getNavigationDelegate(initialRoute.component);
@@ -317,14 +398,14 @@ export default class YANavigator extends React.Component {
         renderScene={this._renderScene}
         configureScene={this._configureScene}
         defaultSceneConfig={defaultSceneConfig}
-        navigationBar={this._renderNavigationBar(
+        navigationBar={useNavigationBar ? this._renderNavigationBar(
           navBarStyle,
-          navBarComponentsDefaultStyles,
           navigationDelegate ?
             navigationDelegate.navBarIsHidden :
             false,
-          navBarBackIcon
-        )}
+          navBarBackBtn,
+          navBarUnderlay,
+        ) : null}
         sceneStyle={sceneStyle}
         onWillFocus={this._onWillFocus}
         style={[
@@ -338,14 +419,14 @@ export default class YANavigator extends React.Component {
   static propTypes = {
     initialRoute: Navigator.propTypes.initialRoute,
     defaultSceneConfig: PropTypes.object,
+    useNavigationBar: PropTypes.bool,
     style: View.propTypes.style,
     navBarStyle: View.propTypes.style,
-    navBarComponentsDefaultStyles: PropTypes.shape({
-      title: PropTypes.object,
-      leftBtn: PropTypes.object,
-      rightBtn: PropTypes.object,
+    navBarUnderlay: PropTypes.object,
+    navBarBackBtn: PropTypes.shape({
+      icon: PropTypes.object,
+      textStyle: PropTypes.object,
     }),
-    navBarBackIcon: PropTypes.object,
     sceneStyle: View.propTypes.style,
   };
 
@@ -353,6 +434,10 @@ export default class YANavigator extends React.Component {
     defaultSceneConfig: React.Platform.OS === 'android' ?
       Navigator.SceneConfigs.FadeAndroid :
       Navigator.SceneConfigs.PushFromRight,
+    useNavigationBar: true,
+    navBarBackBtn: {
+      textStyle: {},
+    },
   };
 
   static navBarHeight = Scene.navBarHeight;
