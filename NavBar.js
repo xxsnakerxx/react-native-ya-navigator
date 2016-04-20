@@ -430,7 +430,7 @@ export default class NavBar extends React.Component {
             ],
           },
         ]}>
-        {underlay}
+        {navBarBackgroundColor !== 'transparent' ? underlay : null}
         <View
           style={[
             styles.titleContainer,
