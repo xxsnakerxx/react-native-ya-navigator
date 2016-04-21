@@ -14,7 +14,7 @@ const {
   BackAndroid,
 } = React;
 
-const VALID_EVENTED_PROPS = ['onPress', 'onValueChange', 'onChange'];
+const VALID_EVENTED_PROPS = ['onPress', 'onValueChange', 'onChange', 'onSelection'];
 
 export default class YANavigator extends React.Component {
   componentDidMount() {
