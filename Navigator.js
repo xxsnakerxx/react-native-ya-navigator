@@ -231,8 +231,6 @@ export default class YANavigator extends React.Component {
 
             const navigationDelegate = getNavigationDelegate(route.component);
 
-            navigationDelegate._events = navigationDelegate._events || [];
-
             if (navigationDelegate &&
                 navigationDelegate.renderNavBarRightPart) {
 
