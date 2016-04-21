@@ -166,7 +166,7 @@ There are a few simple rules
 
 - if you pass as navBar item just a `class`, it should have `propTypes` with prop that you want to listen, then you should define method that will be called (`onNavBarTitlePress`, `onNavBarLeftPartPress`, `onNavBarRightPartPress`, `onNavBarTitleChange`, `onNavBarTitleValueChange`, etc...)
 - if you pass as navBar item `JSX`, then props that you want to listen should return just a string - __name of the delegate method that will be called__
-- currently supported props `onPress`, `onChange`, `onValueChange`
+- currently supported props `onPress`, `onChange`, `onValueChange`, 'onSelection'
 
 ```javascript
 class MyNavBarTitle extends React.Component {
