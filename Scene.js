@@ -14,16 +14,15 @@ export default class Scene extends React.Component {
       const navigationDelegate = delegate.constructor.navigationDelegate;
 
       if (navigationDelegate && navigationDelegate.id) {
-        const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate, {
-          _events: undefined,
-        });
+        const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate)
 
         const navigationContext = delegate.props.navigator.navigationContext;
         const delegateId = delegate.constructor.navigationDelegate.id;
 
         setTimeout(() => {
           const events = delegate.constructor.navigationDelegate._events;
-
+          navigationDelegateCopy._events = events;
+          
           if (events && events.length) {
             events.forEach((eventName) => {
               this[`_${eventName}Sub`] = navigationContext.addListener(

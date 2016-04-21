@@ -131,7 +131,9 @@ export default class YANavigator extends React.Component {
                         navigator.navigationContext
                       )
 
-                    navigationDelegate._events = events;
+                    navigationDelegate._events.concat(events.filter((event) => {
+                      return navigationDelegate._events.indexOf(event) < 0;
+                    }));
 
                     return reactElement
                   })
@@ -145,7 +147,10 @@ export default class YANavigator extends React.Component {
                     navigator.navigationContext
                   )
 
-                navigationDelegate._events = events;
+                navigationDelegate._events.concat(events.filter((event) => {
+                  return navigationDelegate._events.indexOf(event) < 0;
+                }));
+
                 LeftPart = reactElement;
 
                 LeftPart = React.cloneElement(LeftPart, {
@@ -249,7 +254,9 @@ export default class YANavigator extends React.Component {
                         navigator.navigationContext
                       )
 
-                    navigationDelegate._events = events;
+                    navigationDelegate._events.concat(events.filter((event) => {
+                      return navigationDelegate._events.indexOf(event) < 0;
+                    }));
 
                     return reactElement
                   })
@@ -263,7 +270,10 @@ export default class YANavigator extends React.Component {
                     navigator.navigationContext
                   )
 
-                navigationDelegate._events = events;
+                navigationDelegate._events.concat(events.filter((event) => {
+                  return navigationDelegate._events.indexOf(event) < 0;
+                }));
+
                 RightPart = reactElement;
 
                 RightPart = React.cloneElement(RightPart, {
@@ -318,7 +328,9 @@ export default class YANavigator extends React.Component {
                         navigator.navigationContext
                       )
 
-                    navigationDelegate._events = events;
+                    navigationDelegate._events.concat(events.filter((event) => {
+                      return navigationDelegate._events.indexOf(event) < 0;
+                    }));
 
                     return reactElement
                   })
@@ -332,7 +344,10 @@ export default class YANavigator extends React.Component {
                     navigator.navigationContext
                   )
 
-                navigationDelegate._events = events;
+                navigationDelegate._events.concat(events.filter((event) => {
+                  return navigationDelegate._events.indexOf(event) < 0;
+                }));
+
                 Title = reactElement;
 
                 Title = React.cloneElement(Title, {
