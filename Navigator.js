@@ -18,6 +18,26 @@ const VALID_EVENTED_PROPS = ['onPress', 'onValueChange', 'onChange', 'onSelectio
 
 export default class YANavigator extends React.Component {
   componentDidMount() {
+    const navigatorMethods = [
+      'getCurrentRoutes',
+      'jumpBack',
+      'jumpForward',
+      'jumpTo',
+      'push',
+      'pop',
+      'replace',
+      'replaceAtIndex',
+      'replacePrevious',
+      'resetTo',
+      'immediatelyResetRouteStack',
+      'popToRoute',
+      'popToTop',
+    ];
+
+    navigatorMethods.forEach((method) => {
+      this[method] = this.refs.navigator[method];
+    })
+
     if (Platform.OS === 'android') {
       this._backPressSub = BackAndroid.addEventListener('hardwareBackPress', () => {
         const { navigator } = this.refs;
