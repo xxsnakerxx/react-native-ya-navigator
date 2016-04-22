@@ -442,70 +442,76 @@ export default class NavBar extends React.Component {
                 height,
             },
           ]}>
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  transform: IS_IOS ? [
-                    {
-                      translateX: animationProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange:
-                          isGoingBack ?
-                            [-(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0] :
-                            [0, -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)],
-                      }),
-                    },
-                  ] : [],
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: titlePartWidth,
-                  alignItems: IS_IOS ? 'center' : 'flex-start',
-                }}>
+            {prevTitle ?
+              <Animated.View
+                style={[
+                  styles.animatedWrapper,
+                  {
+                    transform: IS_IOS ? [
+                      {
+                        translateX: animationProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange:
+                            isGoingBack ?
+                              [-(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0] :
+                              [0, -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)],
+                        }),
+                      },
+                    ] : [],
+                    opacity: animationProgress.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
+                    }),
+                  },
+                ]}
+              >
                 <View
-                  onLayout={IS_IOS ? this._onPrevTitleLayout : null}>
-                  {prevTitle}
+                  style={{
+                    width: titlePartWidth,
+                    alignItems: IS_IOS ? 'center' : 'flex-start',
+                  }}>
+                  <View
+                    onLayout={IS_IOS ? this._onPrevTitleLayout : null}>
+                    {prevTitle}
+                  </View>
                 </View>
-              </View>
-            </Animated.View>
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  justifyContent: IS_IOS ? 'center' : 'flex-start',
-                  transform: IS_IOS ? [
-                    {
-                      translateX: animationProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange:
-                          isGoingBack ?
-                            [0, (leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)] :
-                            [(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0],
-                      }),
-                    },
-                  ] : [],
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: titlePartWidth,
-                  alignItems: IS_IOS ? 'center' : 'flex-start',
-                }}>
-                {title}
-              </View>
-            </Animated.View>
+              </Animated.View> :
+              null
+            }
+            {title && animationFromIndex !== animationToIndex ?
+              <Animated.View
+                style={[
+                  styles.animatedWrapper,
+                  {
+                    justifyContent: IS_IOS ? 'center' : 'flex-start',
+                    transform: IS_IOS ? [
+                      {
+                        translateX: animationProgress.interpolate({
+                          inputRange: [0, 0.999, 1],
+                          outputRange:
+                            isGoingBack ?
+                              [0, (leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), -SCREEN_WIDTH] :
+                              [(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0, 0],
+                        }),
+                      },
+                    ] : [],
+                    opacity: animationProgress.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
+                    }),
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    width: titlePartWidth,
+                    alignItems: IS_IOS ? 'center' : 'flex-start',
+                  }}>
+                  {title}
+                </View>
+              </Animated.View> :
+              null
+            }
         </View>
 
         <View
