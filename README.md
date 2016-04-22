@@ -49,7 +49,7 @@ class App extends React.Component {
 }
 ```
 
-#### YANavigator [propTypes](https://github.com/xxsnakerxx/react-native-ya-navigator/blob/master/Navigator.js#L419):
+#### YANavigator [propTypes](https://github.com/xxsnakerxx/react-native-ya-navigator/blob/master/Navigator.js#L436):
   - `style`
   - `navBarStyle`
   - `sceneStyle`
@@ -61,6 +61,7 @@ and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
   - `navBarBackBtn`
     - `icon`
     - `textStyle`
+  - `eachSceneProps` (these props will be passed to each scene, for example, if you are using YANavigator inside tabs, you can to pass 'selected' prop to each scene, so each scene can decide should it updated via shouldComponentUpdate if it was hidden)
 
 Also `YANavigator` class has static property `navBarHeight` (you can use it in your styles)
 

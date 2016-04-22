@@ -52,16 +52,20 @@ export default class YANavigator extends React.Component {
   _renderScene = (route, navigator) => {
     let Component;
 
+    const { eachSceneProps } = this.props;
+
     if (typeof route.component === 'object') {
       Component = React.cloneElement(route.component, {
         navigator,
         ...route.props,
+        ...eachSceneProps,
       });
     } else if (typeof route.component === 'function') {
       Component = (
         <route.component
           navigator={navigator}
           {...route.props}
+          {...eachSceneProps}
           />
         )
     }
@@ -441,6 +445,7 @@ export default class YANavigator extends React.Component {
       textStyle: PropTypes.object,
     }),
     sceneStyle: View.propTypes.style,
+    eachSceneProps: PropTypes.object,
   };
 
   static defaultProps = {
