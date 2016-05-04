@@ -40,6 +40,7 @@ export default class NavBar extends React.Component {
       animationToIndex: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
+      titleWidth: 0,
       backIconWidth: 0,
       width: SCREEN_WIDTH,
       height: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
@@ -105,6 +106,7 @@ export default class NavBar extends React.Component {
       animationToIndex: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
+      titleWidth: 0,
       backIconWidth: 0,
     });
   }
@@ -160,6 +162,14 @@ export default class NavBar extends React.Component {
     })
   };
 
+  _onTitleLayout = (e) => {
+    const { layout } = e.nativeEvent;
+
+    this.setState({
+      titleWidth: layout.width,
+    })
+  }
+
   _onNavBarLayout = (e) => {
     const { layout } = e.nativeEvent;
 
@@ -189,6 +199,7 @@ export default class NavBar extends React.Component {
       height,
       prevTitleXPos,
       prevTitleWidth,
+      titleWidth,
       backIconWidth,
     } = this.state;
 
@@ -319,8 +330,8 @@ export default class NavBar extends React.Component {
                         translateX: animationProgress.interpolate({
                           inputRange: [0, 1],
                           outputRange: isGoingBack ?
-                            [2, leftPartWidth + prevTitleXPos - (backIconWidth + 10 + 2)] :
-                            [leftPartWidth + prevTitleXPos - (backIconWidth + 10 + 2), 2],
+                            [2, leftPartWidth + Math.abs(prevTitleXPos) - (backIconWidth + 10 + 2)] :
+                            [leftPartWidth + Math.abs(prevTitleXPos) - (backIconWidth + 10 + 2), 2],
                         }),
                       },
                     ],
@@ -453,8 +464,16 @@ export default class NavBar extends React.Component {
                           inputRange: [0, 1],
                           outputRange:
                             isGoingBack ?
-                              [-(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0] :
-                              [0, -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2)],
+                              [
+                                titlePartWidth - prevTitleWidth > 0 ?
+                                  -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2) : 0,
+                                0,
+                              ] :
+                              [
+                                0,
+                                titlePartWidth - prevTitleWidth > 0 ?
+                                  -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2) : 0,
+                              ],
                         }),
                       },
                     ] : [],
@@ -490,8 +509,8 @@ export default class NavBar extends React.Component {
                           inputRange: [0, 0.999, 1],
                           outputRange:
                             isGoingBack ?
-                              [0, (leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), -SCREEN_WIDTH] :
-                              [(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2), 0, 0],
+                              [0, (leftPartWidth + ((titlePartWidth - titleWidth) / 2)) + (backIconWidth + 10 + 2), -SCREEN_WIDTH] :
+                              [(leftPartWidth + ((titlePartWidth - titleWidth) / 2)) + (backIconWidth + 10 + 2), 0, 0],
                         }),
                       },
                     ] : [],
@@ -507,126 +526,136 @@ export default class NavBar extends React.Component {
                     width: titlePartWidth,
                     alignItems: IS_IOS ? 'center' : 'flex-start',
                   }}>
-                  {title}
+                  <View
+                    onLayout={IS_IOS ? this._onTitleLayout : null}>
+                    {title}
+                  </View>
                 </View>
               </Animated.View> :
               null
             }
         </View>
 
-        <View
-          style={[
-            styles.navBarLeftPartContainer,
-            {
-              width: leftPartWidth,
-              height: getOrientation() === 'PORTRAIT' ?
-                height - NAV_BAR_STYLES.General.StatusBarHeight :
-                height,
-            },
-          ]}>
-          {prevLeftPart ?
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: isGoingBack ? [0, 1] : [1, 0],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: leftPartWidth,
-                  alignItems: 'flex-start',
-                }}>
-                {prevLeftPart}
-              </View>
-            </Animated.View> :
-            null
-          }
-          {leftPart && animationFromIndex !== animationToIndex ?
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: isGoingBack ? [1, 0] : [0, 1],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: leftPartWidth,
-                  alignItems: 'flex-start',
-                }}>
-                {leftPart}
-              </View>
-            </Animated.View> :
-            null
-          }
-          {backBtn}
-          {prevBackBtn}
-        </View>
+        {prevLeftPart || (leftPart && animationFromIndex !== animationToIndex) ||
+         prevBackBtn || backBtn ?
+         <View
+           style={[
+             styles.navBarLeftPartContainer,
+             {
+               width: leftPartWidth,
+               height: getOrientation() === 'PORTRAIT' ?
+                 height - NAV_BAR_STYLES.General.StatusBarHeight :
+                 height,
+             },
+           ]}>
+           {prevLeftPart ?
+             <Animated.View
+               style={[
+                 styles.animatedWrapper,
+                 {
+                   opacity: animationProgress.interpolate({
+                     inputRange: [0, 1],
+                     outputRange: isGoingBack ? [0, 1] : [1, 0],
+                   }),
+                 },
+               ]}
+             >
+               <View
+                 style={{
+                   flex: 1,
+                   alignItems: 'flex-start',
+                 }}>
+                 {prevLeftPart}
+               </View>
+             </Animated.View> :
+             null
+           }
+           {leftPart && animationFromIndex !== animationToIndex ?
+             <Animated.View
+               style={[
+                 styles.animatedWrapper,
+                 {
+                   opacity: animationProgress.interpolate({
+                     inputRange: [0, 1],
+                     outputRange: isGoingBack ? [1, 0] : [0, 1],
+                   }),
+                 },
+               ]}
+             >
+               <View
+                 style={{
+                   flex: 1,
+                   alignItems: 'flex-start',
+                 }}>
+                 {leftPart}
+               </View>
+             </Animated.View> :
+             null
+           }
+           {backBtn}
+           {prevBackBtn}
+         </View> :
+         null
+        }
 
-        <View
-          style={[
-            styles.navBarRightPartContainer,
-            {
-              width: rightPartWidth,
-              height: getOrientation() === 'PORTRAIT' ?
-                height - NAV_BAR_STYLES.General.StatusBarHeight :
-                height,
-            },
-          ]}>
-          {prevRightPart ?
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: isGoingBack ? [0, 1] : [1, 0],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: rightPartWidth,
-                  alignItems: 'flex-end',
-                }}>
-                {prevRightPart}
-              </View>
-            </Animated.View> :
-            null
-          }
-          {rightPart && animationFromIndex !== animationToIndex ?
-            <Animated.View
-              style={[
-                styles.animatedWrapper,
-                {
-                  opacity: animationProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: isGoingBack ? [1, 0] : [0, 1],
-                  }),
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: rightPartWidth,
-                  alignItems: 'flex-end',
-                }}>
-                {rightPart}
-              </View>
-            </Animated.View> :
-            null
-          }
-        </View>
+        {prevRightPart || (rightPart && animationFromIndex !== animationToIndex) ?
+          <View
+            style={[
+              styles.navBarRightPartContainer,
+              {
+                width: rightPartWidth,
+                height: getOrientation() === 'PORTRAIT' ?
+                  height - NAV_BAR_STYLES.General.StatusBarHeight :
+                  height,
+              },
+            ]}>
+            {prevRightPart ?
+              <Animated.View
+                style={[
+                  styles.animatedWrapper,
+                  {
+                    opacity: animationProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: isGoingBack ? [0, 1] : [1, 0],
+                    }),
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'flex-end',
+                  }}>
+                  {prevRightPart}
+                </View>
+              </Animated.View> :
+              null
+            }
+            {rightPart && animationFromIndex !== animationToIndex ?
+              <Animated.View
+                style={[
+                  styles.animatedWrapper,
+                  {
+                    opacity: animationProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: isGoingBack ? [1, 0] : [0, 1],
+                    }),
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'flex-end',
+                  }}>
+                  {rightPart}
+                </View>
+              </Animated.View> :
+              null
+            }
+          </View> :
+          null
+        }
 
       </Animated.View>
     )
