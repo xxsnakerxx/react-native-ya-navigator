@@ -50,30 +50,30 @@ export default class NavBar extends React.Component {
   _setTitle(title) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {};
+    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
 
     if (navigationDelegate) {
-      navigationDelegate.renderTitle = (routeProps) => title;
+      navigationDelegate.renderTitle = (routeProps) => title; // eslint-disable-line no-unused-vars
     }
   }
 
   _setLeftPart(part) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {};
+    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
 
     if (navigationDelegate) {
-      navigationDelegate.renderNavBarLeftPart = (routeProps) => part;
+      navigationDelegate.renderNavBarLeftPart = (routeProps) => part; // eslint-disable-line no-unused-vars
     }
   }
 
   _setRightPart(part) {
     const currentRoute = this.props.navState.routeStack.slice(-1)[0];
     const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {};
+    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
 
     if (navigationDelegate) {
-      navigationDelegate.renderNavBarRightPart = (routeProps) => part;
+      navigationDelegate.renderNavBarRightPart = (routeProps) => part; // eslint-disable-line no-unused-vars
     }
   }
 
