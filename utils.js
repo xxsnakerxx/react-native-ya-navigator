@@ -1,4 +1,8 @@
-import React,{ Dimensions } from 'react-native';
+import React from 'react';
+
+import {
+  Dimensions,
+} from 'react-native';
 
 const getNavigationDelegate = (component) => {
   return component.navigationDelegate ||

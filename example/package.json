@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "react": "^0.14.8",
-    "react-native": "^0.24.1",
+    "react-native": "^0.25.1",
     "react-native-blur": "^0.7.11",
     "react-native-vector-icons": "^1.3.4",
     "react-native-ya-navigator": "file:../"
@@ -16,6 +16,6 @@
     "babel-eslint": "^6.0.4",
     "eslint": "^2.9.0",
     "eslint-plugin-react": "^5.0.1",
-    "eslint-plugin-react-native": "^1.0.1"
+    "eslint-plugin-react-native": "^1.0.2"
   }
 }

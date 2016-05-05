@@ -5,6 +5,7 @@
 
 ## Table of contents
 - [Main goals](#main-goals)
+- [Dependencies](#dependencies)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -15,6 +16,10 @@
 - the scene can change navigation bar items dynamically
 - the scene can show/hide navigation bar dynamically
 - the scene itself defines a configuration of the navigation bar
+
+## Dependencies
+- React Native >= `0.25.1`
+- [react-native-vector-icons](https://github.com/oblador/react-native-vector-icons#readme)
 
 ## Installation
 

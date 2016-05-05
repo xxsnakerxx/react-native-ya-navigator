@@ -1,20 +1,19 @@
-import React from 'react-native';
+import React, { PropTypes } from 'react';
 
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
 import { getNavigationDelegate, getOrientation } from './utils';
 
-const {
+import {
   View,
   Text,
   TouchableOpacity,
   Navigator,
   Animated,
   StyleSheet,
-  PropTypes,
   Dimensions,
   Platform,
-} = React;
+} from 'react-native';
 
 const IS_IOS = Platform.OS === 'ios';
 

@@ -1,18 +1,17 @@
-import React from 'react-native';
+import React, { PropTypes } from 'react';
 
 import NavBar from './NavBar';
 import Scene from './Scene';
 
 import { getNavigationDelegate, replaceInstanceEventedProps } from './utils';
 
-const {
+import {
   View,
   StyleSheet,
   Navigator,
-  PropTypes,
   Platform,
   BackAndroid,
-} = React;
+} from 'react-native';
 
 const VALID_EVENTED_PROPS = [
   'onPress',
@@ -479,7 +478,7 @@ export default class YANavigator extends React.Component {
   };
 
   static defaultProps = {
-    defaultSceneConfig: React.Platform.OS === 'android' ?
+    defaultSceneConfig: Platform.OS === 'android' ?
       Navigator.SceneConfigs.FadeAndroid :
       Navigator.SceneConfigs.PushFromRight,
     useNavigationBar: true,

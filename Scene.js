@@ -1,10 +1,9 @@
-import React from 'react-native';
+import React, { PropTypes } from 'react';
 
-const {
+import {
   View,
   Navigator,
-  PropTypes,
-} = React;
+} from 'react-native';
 
 export default class Scene extends React.Component {
   componentDidMount() {
@@ -22,7 +21,7 @@ export default class Scene extends React.Component {
         setTimeout(() => {
           const events = delegate.constructor.navigationDelegate._events;
           navigationDelegateCopy._events = events;
-          
+
           if (events && events.length) {
             events.forEach((eventName) => {
               this[`_${eventName}Sub`] = navigationContext.addListener(

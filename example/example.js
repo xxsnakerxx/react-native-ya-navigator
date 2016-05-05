@@ -2,9 +2,9 @@ import YANavigator from 'react-native-ya-navigator';
 
 import { BlurView } from 'react-native-blur';
 
-import React, {
-  PropTypes,
-  Component,
+import React, { PropTypes } from 'react';
+
+import {
   StyleSheet,
   Text,
   View,
@@ -19,7 +19,7 @@ import React, {
   Platform,
 } from 'react-native';
 
-export default class YANavigatorExample extends Component {
+export default class YANavigatorExample extends React.Component {
   render() {
     return (
       <YANavigator
@@ -60,7 +60,7 @@ class View1NavBarLeftBtn extends React.Component {
   }
 }
 
-class View1 extends Component {
+class View1 extends React.Component {
   onNavBarLeftPartPress() {
     alert('Left side - btn press');
   }
@@ -194,7 +194,7 @@ class View2NavBarRightBtn extends React.Component {
   }
 }
 
-class View2 extends Component {
+class View2 extends React.Component {
   constructor(props) {
     super(props);
 
@@ -297,7 +297,7 @@ class View2 extends Component {
   }
 }
 
-class View3 extends Component {
+class View3 extends React.Component {
   render() {
     return (
       <YANavigator.Scene
@@ -368,7 +368,7 @@ class View4NAvBarLogo extends React.Component {
   }
 }
 
-class View4 extends Component {
+class View4 extends React.Component {
   render() {
     return (
       <YANavigator.Scene
@@ -445,7 +445,7 @@ class View4 extends Component {
   }
 }
 
-class View5 extends Component {
+class View5 extends React.Component {
   onResetBtnPress() {
     this.props.navigator.immediatelyResetRouteStack([
       {
