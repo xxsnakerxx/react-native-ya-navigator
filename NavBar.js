@@ -25,7 +25,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const NAVBAR_LANDSCAPE_HEIGHT_IOS = 32;
 const NAVBAR_LANDSCAPE_HEIGHT_ANDROID = 40;
 const DEFAULT_IOS_BACK_ICON = 'ios-arrow-back';
-const DEFAULT_ANDROID_BACK_ICON = 'android-arrow-back';
+const DEFAULT_ANDROID_BACK_ICON = 'md-arrow-back';
 
 export default class NavBar extends React.Component {
   constructor(props) {
