@@ -166,6 +166,26 @@ class MyScene extends React.Component {
 
 Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__default value__) then scene will have top padding equals height of the navigation bar, also you can use `YANavigator.navBarHeight` in your styles)
 
+And one more thing... ;-)
+
+You can listen `back button press` via route prop `onBackBtnPress`
+
+```javascript
+...
+onLinkPress = (link) => {
+  tabBar.hide(),
+
+  this.props.navigator.push({
+    component: Browser,
+    props: {
+      url: link,
+      onBackBtnPress: () => tabBar.show(),
+    },
+  })
+}
+...
+```
+
 ### How to handle navigation bar items events?
 
 There are a few simple rules

@@ -228,7 +228,16 @@ export default class YANavigator extends React.Component {
                 const backBtnConfig = {
                   isBackBtn: true,
                   text: backBtnText,
-                  onPress: navigator.pop,
+                  onPress: () => {
+                    if (state.routeStack[index] &&
+                        state.routeStack[index].props &&
+                        state.routeStack[index].props.onBackBtnPress) {
+
+                      state.routeStack[index].props.onBackBtnPress();
+                    }
+
+                    navigator.pop()
+                  },
                   textStyle: navBarBackBtn.textStyle,
                 }
 
