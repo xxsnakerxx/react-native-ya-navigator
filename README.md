@@ -168,7 +168,7 @@ Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__defau
 
 And one more thing... ;-)
 
-You can listen `back button press` via route prop `onBackBtnPress`
+You can listen when a scene will lose focus via route prop `onBlur`
 
 ```javascript
 ...
@@ -179,7 +179,7 @@ onLinkPress = (link) => {
     component: Browser,
     props: {
       url: link,
-      onBackBtnPress: () => tabBar.show(),
+      onBlur: () => tabBar.show(),
     },
   })
 }

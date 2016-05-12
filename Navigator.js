@@ -228,16 +228,7 @@ export default class YANavigator extends React.Component {
                 const backBtnConfig = {
                   isBackBtn: true,
                   text: backBtnText,
-                  onPress: () => {
-                    if (state.routeStack[index] &&
-                        state.routeStack[index].props &&
-                        state.routeStack[index].props.onBackBtnPress) {
-
-                      state.routeStack[index].props.onBackBtnPress();
-                    }
-
-                    navigator.pop()
-                  },
+                  onPress: navigator.pop,
                   textStyle: navBarBackBtn.textStyle,
                 }
 
@@ -420,9 +411,22 @@ export default class YANavigator extends React.Component {
   }
 
   _onWillFocus = (route) => {
+    const { navigator } = this.refs;
     const component = route.component;
-    const navBar = this.refs.navigator &&
-      this.refs.navigator._navBar;
+    const state = navigator && navigator.state;
+
+    if (state) {
+      const index = state.presentedIndex;
+
+      if (state.routeStack[index] &&
+          state.routeStack[index].props &&
+          state.routeStack[index].props.onBlur) {
+
+        state.routeStack[index].props.onBlur();
+      }
+    }
+
+    const navBar = navigator && navigator._navBar;
     const navigationDelegate = getNavigationDelegate(component);
 
     if (navBar && navigationDelegate) {
