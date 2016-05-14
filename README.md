@@ -179,7 +179,10 @@ onLinkPress = (link) => {
     component: Browser,
     props: {
       url: link,
-      onBlur: () => tabBar.show(),
+      /**
+       * @param {Boolean} true means the scene was popped, false means a new scene was pushed
+       */
+      onBlur: (isBack) => tabBar.show(),
     },
   })
 }
