@@ -416,16 +416,20 @@ export default class YANavigator extends React.Component {
     const state = navigator && navigator.state;
 
     if (state) {
-      const index = state.presentedIndex;
+      setTimeout(() => {
+        const index = state.presentedIndex;
 
-      if (state.routeStack[index] &&
-          state.routeStack[index].props &&
-          state.routeStack[index].props.onBlur) {
+        for (let i = state.routeStack.length - 1; i > index; i--) {
+          if (state.routeStack[i] &&
+              state.routeStack[i].props &&
+              state.routeStack[i].props.onBlur) {
 
-        state.routeStack[index].props.onBlur(
-          route.__navigatorRouteID !== undefined
-        );
-      }
+            state.routeStack[i].props.onBlur(
+              route.__navigatorRouteID !== undefined
+            );
+          }
+        }
+      }, 100);
     }
 
     const navBar = navigator && navigator._navBar;
