@@ -196,7 +196,7 @@ export default class YANavigator extends React.Component {
                   if (LeftPart.propTypes[validProp]) {
                     const event = `onNavBarLeftPart${validProp.replace(/^on/, '')}`
 
-                    if (!navigationDelegate._events.includes(event)) {
+                    if (navigationDelegate._events.indexOf(event) < 0) {
                       navigationDelegate._events.push(event)
                     }
 
@@ -243,7 +243,7 @@ export default class YANavigator extends React.Component {
 
                     const event = 'onNavBarBackBtnPress'
 
-                    if (!navigationDelegate._events.includes(event)) {
+                    if (navigationDelegate._events.indexOf(event) < 0) {
                       navigationDelegate._events.push(event)
                     }
 
@@ -317,7 +317,7 @@ export default class YANavigator extends React.Component {
                   if (RightPart.propTypes[validProp]) {
                     const event = `onNavBarRightPart${validProp.replace(/^on/, '')}`
 
-                    if (!navigationDelegate._events.includes(event)) {
+                    if (navigationDelegate._events.indexOf(event) < 0) {
                       navigationDelegate._events.push(event)
                     }
 
@@ -391,7 +391,7 @@ export default class YANavigator extends React.Component {
                   if (Title.propTypes[validProp]) {
                     const event = `onNavBarTitle${validProp.replace(/^on/, '')}`
 
-                    if (!navigationDelegate._events.includes(event)) {
+                    if (navigationDelegate._events.indexOf(event) < 0) {
                       navigationDelegate._events.push(event)
                     }
 

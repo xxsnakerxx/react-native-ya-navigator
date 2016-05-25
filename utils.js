@@ -23,7 +23,7 @@ const replaceInstanceEventedProps =
       const event = reactElement.props[eventedProp]();
 
       if (typeof event === 'string') {
-        if (!events.includes(event)) {
+        if (events.indexOf(event) < 0) {
           events.push(event)
         }
 
