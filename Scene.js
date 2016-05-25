@@ -23,6 +23,8 @@ export default class Scene extends React.Component {
           navigationDelegateCopy._events = events;
 
           if (events && events.length) {
+            this._events = events.slice();
+
             events.forEach((eventName) => {
               this[`_${eventName}Sub`] = navigationContext.addListener(
                 eventName,
@@ -42,30 +44,20 @@ export default class Scene extends React.Component {
         delegate.componentWillUnmount = () => {
           delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
 
-          const events = delegate.constructor.navigationDelegate._events;
+          const events = this._events;
 
           if (events && events.length) {
-            this._removeSubs();
+            events.forEach((eventName) => {
+              this[`_${eventName}Sub`].remove();
+              this[`_${eventName}Sub`] = null;
+            });
           }
+
+          this._events = null;
 
           // restore here because we might change it by navBar.updateUI etc...
           delegate.constructor.navigationDelegate = navigationDelegateCopy;
         }
-      }
-    }
-  }
-
-  _removeSubs() {
-    const { delegate } = this.props;
-
-    if (delegate) {
-      const events = delegate.constructor.navigationDelegate._events;
-
-      if (events) {
-        events.forEach((eventName) => {
-          this[`_${eventName}Sub`].remove();
-          this[`_${eventName}Sub`] = null;
-        });
       }
     }
   }
