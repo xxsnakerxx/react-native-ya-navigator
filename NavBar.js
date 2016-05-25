@@ -275,7 +275,7 @@ export default class NavBar extends React.Component {
       prevRoute && routeMapper.LeftPart(
         prevRoute || route,
         navigator,
-        (isGoingBack ? animationFromIndex : animationToIndex) - 1,
+        isGoingBack ? animationToIndex  : animationFromIndex,
         navState
       ) || null;
 
