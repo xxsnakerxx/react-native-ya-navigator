@@ -37,6 +37,7 @@ export default class YANavigator extends React.Component {
       'replace',
       'replaceAtIndex',
       'replacePrevious',
+      'replacePreviousAndPop',
       'resetTo',
       'immediatelyResetRouteStack',
       'popToRoute',
