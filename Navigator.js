@@ -50,6 +50,8 @@ export default class YANavigator extends React.Component {
 
     if (Platform.OS === 'android') {
       this._backPressSub = BackAndroid.addEventListener('hardwareBackPress', () => {
+        if (!this.props.shouldHandleAndroidBack) return false;
+
         const { navigator } = this.refs;
         const navState = navigator.state;
         const presentedComponent =
@@ -495,6 +497,7 @@ export default class YANavigator extends React.Component {
     }),
     sceneStyle: View.propTypes.style,
     eachSceneProps: PropTypes.object,
+    shouldHandleAndroidBack: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -502,6 +505,7 @@ export default class YANavigator extends React.Component {
       Navigator.SceneConfigs.FadeAndroid :
       Navigator.SceneConfigs.PushFromRight,
     useNavigationBar: true,
+    shouldHandleAndroidBack: true,
     navBarBackBtn: {
       textStyle: {},
     },
