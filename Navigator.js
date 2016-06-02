@@ -26,6 +26,14 @@ const VALID_EVENTED_PROPS = [
 ];
 
 export default class YANavigator extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      shouldHandleAndroidBack: props.shouldHandleAndroidBack,
+    }
+  }
+
   componentDidMount() {
     const navigatorMethods = [
       'getCurrentRoutes',
@@ -48,15 +56,17 @@ export default class YANavigator extends React.Component {
       this[method] = this.refs.navigator[method];
     })
 
+    this.refs.navigator.setShouldHandleAndroidBack = this.setShouldHandleAndroidBack.bind(this);
+
     if (Platform.OS === 'android') {
       this._backPressSub = BackAndroid.addEventListener('hardwareBackPress', () => {
-        if (!this.props.shouldHandleAndroidBack) return false;
+        if (!this.state.shouldHandleAndroidBack) return false;
 
         const { navigator } = this.refs;
         const navState = navigator.state;
         const presentedComponent =
           navState.routeStack[navState.presentedIndex].component;
-        const navigationDelegate = getNavigationDelegate(presentedComponent)
+        const navigationDelegate = getNavigationDelegate(presentedComponent);
 
         if (navigationDelegate && navigationDelegate.onAndroidBackPress) {
 
@@ -74,11 +84,23 @@ export default class YANavigator extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
+    })
+  }
+
   componentWillUnmount() {
     if (Platform.OS === 'android') {
       this._backPressSub.remove();
       this._backPressSub = null;
     }
+  }
+
+  setShouldHandleAndroidBack(should) {
+    this.setState({
+      shouldHandleAndroidBack: should,
+    });
   }
 
   _renderScene = (route, navigator) => {
