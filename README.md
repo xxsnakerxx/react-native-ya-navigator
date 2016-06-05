@@ -226,6 +226,14 @@ class MyScene extends React.Component {
     alert('Right side - second btn press');
   }
 
+  willfocus() {
+    console.log('Scene will focus');
+  }
+
+  didfocus() {
+    console.log('Scene did focus');
+  }
+
   render() {
     return (
       <YANavigator.Scene
