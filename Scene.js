@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 
 export default class Scene extends React.Component {
-  componentDidMount() {
+  componentWillMount() {
     const { delegate } = this.props;
 
     if (delegate) {
@@ -15,26 +15,21 @@ export default class Scene extends React.Component {
       if (navigationDelegate && navigationDelegate.id) {
         const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate)
 
-        const navigationContext = delegate.props.navigator.navigationContext;
-        const delegateId = delegate.constructor.navigationDelegate.id;
+        const navigationEvents = ['willfocus', 'didfocus'];
+
+        navigationEvents.forEach((eventName) => {
+          this._addListener(eventName, delegate);
+        })
 
         setTimeout(() => {
           const events = delegate.constructor.navigationDelegate._events;
           navigationDelegateCopy._events = events;
 
           if (events && events.length) {
-            this._events = events.concat(['willfocus', 'didfocus']);
+            this._events = events.slice();
 
             this._events.forEach((eventName) => {
-              this[`_${eventName}Sub`] = navigationContext.addListener(
-                eventName,
-                ({data: {route, e}}) => {
-                  delegateId ===
-                  route.component.navigationDelegate.id ?
-                    (delegate[eventName] ? delegate[eventName](e) : () => {}) :
-                    null
-                }
-              );
+              this._addListener(eventName, delegate);
             });
           }
         }, 300);
@@ -47,7 +42,7 @@ export default class Scene extends React.Component {
           const events = this._events;
 
           if (events && events.length) {
-            events.forEach((eventName) => {
+            events.concat(navigationEvents).forEach((eventName) => {
               this[`_${eventName}Sub`].remove();
               this[`_${eventName}Sub`] = null;
             });
@@ -60,6 +55,21 @@ export default class Scene extends React.Component {
         }
       }
     }
+  }
+
+  _addListener = (eventName, delegate) => {
+    const navigationContext = delegate.props.navigator.navigationContext;
+    const delegateId = delegate.constructor.navigationDelegate.id;
+
+    this[`_${eventName}Sub`] = navigationContext.addListener(
+      eventName,
+      ({data: {route, e}}) => {
+        delegateId ===
+        route.component.navigationDelegate.id ?
+          (delegate[eventName] ? delegate[eventName](e) : () => {}) :
+          null
+      }
+    );
   }
 
   render() {
