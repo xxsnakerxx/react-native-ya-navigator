@@ -23,9 +23,9 @@ export default class Scene extends React.Component {
           navigationDelegateCopy._events = events;
 
           if (events && events.length) {
-            this._events = events.slice();
+            this._events = events.concat(['willfocus', 'didfocus']);
 
-            events.forEach((eventName) => {
+            this._events.forEach((eventName) => {
               this[`_${eventName}Sub`] = navigationContext.addListener(
                 eventName,
                 ({data: {route, e}}) => {
