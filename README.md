@@ -55,18 +55,18 @@ class App extends React.Component {
 ```
 
 #### YANavigator [propTypes](https://github.com/xxsnakerxx/react-native-ya-navigator/blob/master/Navigator.js#L436):
-  - `style`
-  - `navBarStyle`
-  - `sceneStyle`
-  - `initialRoute`
-  - `defaultSceneConfig` (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
-and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
-  - `useNavigationBar` (useful if you want to render your navBar component on each scene ([ToolbarAndroid](https://facebook.github.io/react-native/docs/toolbarandroid.html#content) for example) instead of the embedded navBar)
-  - `navBarUnderlay` (the view that will be rendered under all navBar items ([react-native-blur](https://github.com/react-native-fellowship/react-native-blur) for example))
-  - `navBarBackBtn`
-    - `icon`
-    - `textStyle`
-  - `eachSceneProps` (these props will be passed to each scene, for example, if you are using YANavigator inside tabs, you can to pass 'selected' prop to each scene, so each scene can decide should it updated via shouldComponentUpdate if it was hidden)
+- `style`
+- `navBarStyle`
+- `sceneStyle`
+- `initialRoute`
+- `defaultSceneConfig` (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
+  and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
+- `useNavigationBar` (useful if you want to render your navBar component on each scene ([ToolbarAndroid](https://facebook.github.io/react-native/docs/toolbarandroid.html#content) for example) instead of the embedded navBar)
+- `navBarUnderlay` (the view that will be rendered under all navBar items ([react-native-blur](https://github.com/react-native-fellowship/react-native-blur) for example))
+- `navBarBackBtn`
+  - `icon`
+  - `textStyle`
+- `eachSceneProps` (these props will be passed to each scene, for example, if you are using YANavigator inside tabs, you can to pass 'selected' prop to each scene, so each scene can decide should it updated via shouldComponentUpdate if it was hidden)
 
 Also `YANavigator` class has static property `navBarHeight` (you can use it in your styles)
 
@@ -226,6 +226,9 @@ class MyScene extends React.Component {
     alert('Right side - second btn press');
   }
 
+  // Note:
+  // 'willfocus' fires before scene was mounted 
+  // so if you want to listen when scene will get focus on 'push' 	// you should use 'componentDidMount' instead
   willfocus() {
     console.log('Scene will focus');
   }
