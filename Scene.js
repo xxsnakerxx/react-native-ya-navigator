@@ -13,13 +13,13 @@ export default class Scene extends React.Component {
       const navigationDelegate = delegate.constructor.navigationDelegate;
 
       if (navigationDelegate && navigationDelegate.id) {
-        const navigationDelegateCopy = Object.assign({}, delegate.constructor.navigationDelegate)
+        const navigationDelegateCopy = Object.assign({},
+          delegate.constructor.navigationDelegate)
 
         const navigationEvents = ['willfocus', 'didfocus'];
 
-        navigationEvents.forEach((eventName) => {
-          this._addListener(eventName, delegate);
-        })
+        navigationEvents.forEach((eventName) =>
+          this._addListener(eventName, delegate))
 
         setTimeout(() => {
           const events = delegate.constructor.navigationDelegate._events;
@@ -39,13 +39,13 @@ export default class Scene extends React.Component {
         delegate.componentWillUnmount = () => {
           delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
 
+          navigationEvents.forEach((eventName) =>
+            this._removeListener(eventName, delegate))
+
           const events = this._events;
 
           if (events && events.length) {
-            events.concat(navigationEvents).forEach((eventName) => {
-              this[`_${eventName}Sub`].remove();
-              this[`_${eventName}Sub`] = null;
-            });
+            events.forEach((eventName) => this._removeListener(eventName));
           }
 
           this._events = null;
@@ -70,6 +70,11 @@ export default class Scene extends React.Component {
           null
       }
     );
+  }
+
+  _removeListener = (eventName) => {
+    this[`_${eventName}Sub`].remove();
+    delete this[`_${eventName}Sub`];
   }
 
   render() {
