@@ -470,6 +470,7 @@ export default class YANavigator extends React.Component {
   render() {
     const {
       initialRoute,
+      initialRouteStack,
       defaultSceneConfig,
       navBarStyle,
       style,
@@ -479,12 +480,17 @@ export default class YANavigator extends React.Component {
       useNavigationBar,
     } = this.props;
 
-    const navigationDelegate = getNavigationDelegate(initialRoute.component);
+    const navigationDelegate = getNavigationDelegate(
+      (initialRoute && initialRoute.component) ||
+      (initialRouteStack && initialRouteStack.length &&
+        initialRouteStack[initialRouteStack.length - 1].component)
+    );
 
     return (
       <Navigator
         ref={'navigator'}
         initialRoute={initialRoute}
+        initialRouteStack={initialRouteStack}
         renderScene={this._renderScene}
         configureScene={this._configureScene}
         defaultSceneConfig={defaultSceneConfig}
@@ -508,6 +514,7 @@ export default class YANavigator extends React.Component {
 
   static propTypes = {
     initialRoute: Navigator.propTypes.initialRoute,
+    initialRouteStack: Navigator.propTypes.initialRouteStack,
     defaultSceneConfig: PropTypes.object,
     useNavigationBar: PropTypes.bool,
     style: View.propTypes.style,

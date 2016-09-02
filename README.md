@@ -59,6 +59,7 @@ class App extends React.Component {
 - `navBarStyle`
 - `sceneStyle`
 - `initialRoute`
+- `initialRouteStack`
 - `defaultSceneConfig` (default value is __Navigator.SceneConfigs.PushFromRight__ for `iOS`
   and __Navigator.SceneConfigs.FadeAndroid__ for `Android`).
 - `useNavigationBar` (useful if you want to render your navBar component on each scene ([ToolbarAndroid](https://facebook.github.io/react-native/docs/toolbarandroid.html#content) for example) instead of the embedded navBar)

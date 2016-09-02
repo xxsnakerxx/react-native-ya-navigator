@@ -189,8 +189,6 @@ export default class NavBar extends React.Component {
     } = this.props;
 
     const {
-      animationToIndex,
-      animationFromIndex,
       animationProgress,
       y,
       opacity,
@@ -201,6 +199,16 @@ export default class NavBar extends React.Component {
       titleWidth,
       backIconWidth,
     } = this.state;
+
+    let {
+      animationToIndex,
+      animationFromIndex,
+    } = this.state;
+
+    if (animationToIndex === 0 && animationFromIndex === 0) {
+      animationToIndex = navState.presentedIndex;
+      animationFromIndex = navState.presentedIndex;
+    }
 
     let underlay = this.props.underlay;
 
