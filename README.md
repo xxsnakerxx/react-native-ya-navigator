@@ -271,7 +271,21 @@ class MyScene extends React.Component {
 
 There are two options:
 
-1. Each scene can access to navBar items via `ref` (__leftPart__, __rightPart__, __title__) and modify its state using standard `setState` method, or can call other methods provided by your component.
+1. Each scene can access to navBar items via `ref` and modify its state using standard `setState` method, or can call other methods provided by your component.
+
+   __ref__ generated from the template 
+
+   ```javascript
+   const ref = `${navigationDelegate.id || `${navigator.state.presentedIndex + 1}_scene`}_leftPart|rightPart|title`;
+
+   // usage
+   this.props.navigator._navBar.refs['navDelegateId_rightPart'].doSmth()
+   // or if navigationDelegate id is not defined
+   this.props.navigator._navBar.refs['1_scene_rightPart'].doSmth()
+   ```
+
+   ​
+
 2. If you want re-render your navBar component with new props or just re-render, then you should use navBar's `updateUI` method
 
 Also NavBar component has some helpful methods
@@ -321,7 +335,7 @@ class MyScene extends React.Component {
   }
 
   onNavBarTitlePress() {
-    this.props.navigator._navBar.refs.title.setState({
+    this.props.navigator._navBar.refs['myScene_title'].setState({
       text: 'Other title',
     })
   }
