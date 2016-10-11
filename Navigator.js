@@ -211,9 +211,10 @@ export default class YANavigator extends React.Component {
 
                 LeftPart = reactElement;
 
-                LeftPart = React.cloneElement(LeftPart, {
-                  ref: 'leftPart',
-                }, children)
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_leftPart`;
+
+                LeftPart = React.cloneElement(LeftPart, {ref}, children)
               } else if (typeof LeftPart === 'function') {
                 const props = {};
 
@@ -230,7 +231,10 @@ export default class YANavigator extends React.Component {
                   }
                 })
 
-                LeftPart = <LeftPart ref={'leftPart'} {...props} />
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_leftPart`;
+
+                LeftPart = <LeftPart ref={ref} {...props} />
               }
             } else {
               if (index > 0) {
@@ -332,9 +336,10 @@ export default class YANavigator extends React.Component {
 
                 RightPart = reactElement;
 
-                RightPart = React.cloneElement(RightPart, {
-                  ref: 'rightPart',
-                }, children)
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_rightPart`;
+
+                RightPart = React.cloneElement(RightPart, {ref}, children)
               } else if (typeof RightPart === 'function') {
                 const props = {};
 
@@ -351,7 +356,10 @@ export default class YANavigator extends React.Component {
                   }
                 })
 
-                RightPart = <RightPart ref={'rightPart'} {...props} />
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_rightPart`;
+
+                RightPart = <RightPart ref={ref} {...props} />
               }
             }
 
@@ -406,9 +414,10 @@ export default class YANavigator extends React.Component {
 
                 Title = reactElement;
 
-                Title = React.cloneElement(Title, {
-                  ref: 'title',
-                }, children)
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_title`;
+
+                Title = React.cloneElement(Title, {ref}, children)
               } else if (typeof Title === 'function') {
                 const props = {};
 
@@ -425,7 +434,10 @@ export default class YANavigator extends React.Component {
                   }
                 })
 
-                Title = <Title ref={'title'} {...props} />
+                const ref = `${navigationDelegate.id ||
+                  `${navigator.state.presentedIndex + 1}_scene`}_title`;
+
+                Title = <Title ref={ref} {...props} />
               }
             }
 
