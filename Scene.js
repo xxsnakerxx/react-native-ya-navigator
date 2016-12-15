@@ -7,23 +7,21 @@ import {
 
 export default class Scene extends React.Component {
   componentDidUpdate() {
-    if (this._needAddListenersOnUpdate) {
-      const { delegate } = this.props;
+    const { delegate } = this.props;
 
-      if (delegate) {
-        const navigationDelegate = delegate.constructor.navigationDelegate;
-        const events = navigationDelegate._events;
+    if (delegate) {
+      const navigationDelegate = delegate.constructor.navigationDelegate;
+      const events = navigationDelegate._events;
 
+      setTimeout(() => {
         if (events && events.length) {
-          this._events = events.slice();
-
-          this._events.forEach((eventName) => {
-            this._addListener(eventName, delegate);
+          events.forEach((eventName) => {
+            if (!this[`_${eventName}Sub`]) {
+              this._addListener(eventName, delegate);
+            }
           });
-
-          this._needAddListenersOnUpdate = false;
         }
-      }
+      }, 300);
     }
   }
 
@@ -52,9 +50,6 @@ export default class Scene extends React.Component {
             this._events.forEach((eventName) => {
               this._addListener(eventName, delegate);
             });
-          } else {
-            // this is hack for supporting initialRouteStack
-            this._needAddListenersOnUpdate = true;
           }
         }, 300);
 
