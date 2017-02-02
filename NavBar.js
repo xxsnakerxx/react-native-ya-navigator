@@ -442,9 +442,6 @@ export default class NavBar extends React.Component {
           navBarBackgroundColorStyle,
           {
             height,
-            paddingTop: getOrientation() === 'PORTRAIT' ?
-              NAV_BAR_STYLES.General.StatusBarHeight :
-              0,
             opacity: isGoingBack &&
                     getNavigationDelegate(prevRoute.component) &&
                     getNavigationDelegate(prevRoute.component).navBarIsHidden ?
@@ -461,6 +458,11 @@ export default class NavBar extends React.Component {
           },
         ]}>
         {navBarBackgroundColor !== 'transparent' ? underlay : null}
+        <View style={{
+          marginTop: getOrientation() === 'PORTRAIT' ?
+            NAV_BAR_STYLES.General.StatusBarHeight :
+            0,
+        }}>
         <View
           style={[
             styles.titleContainer,
@@ -675,7 +677,7 @@ export default class NavBar extends React.Component {
           </View> :
           null
         }
-
+        </View>
       </Animated.View>
     )
   }
