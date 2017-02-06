@@ -459,6 +459,7 @@ export default class NavBar extends React.Component {
         ]}>
         {navBarBackgroundColor !== 'transparent' ? underlay : null}
         <View style={{
+          flex: 1,
           marginTop: getOrientation() === 'PORTRAIT' ?
             NAV_BAR_STYLES.General.StatusBarHeight :
             0,
