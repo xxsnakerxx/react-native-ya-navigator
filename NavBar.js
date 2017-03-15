@@ -1,12 +1,11 @@
 import React, { PropTypes } from 'react';
 
-import Ionicon from 'react-native-vector-icons/Ionicons'
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 import { getNavigationDelegate, getOrientation } from './utils';
 
 import {
   View,
-  Text,
   TouchableOpacity,
   Navigator,
   Animated,
@@ -26,25 +25,43 @@ const NAVBAR_LANDSCAPE_HEIGHT_IOS = 32;
 const NAVBAR_LANDSCAPE_HEIGHT_ANDROID = 40;
 const DEFAULT_IOS_BACK_ICON = 'ios-arrow-back';
 const DEFAULT_ANDROID_BACK_ICON = 'md-arrow-back';
+const PADDING_HORIZONTAL = 10;
 
 export default class NavBar extends React.Component {
+  static propTypes = {
+    style: View.propTypes.style,
+    isHiddenOnInit: PropTypes.bool,
+    navState: Navigator.NavigationBar.propTypes.navState,
+    routeMapper: PropTypes.shape({
+      Title: PropTypes.func.isRequired,
+      LeftPart: PropTypes.func.isRequired,
+      RightPart: PropTypes.func.isRequired,
+      navBarBackgroundColor: PropTypes.func.isRequired,
+    }).isRequired,
+    underlay: PropTypes.object,
+    backIcon: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
-      opacity: new Animated.Value(props.isHiddenOnInit ? 0 : 1),
-      y: new Animated.Value(props.isHiddenOnInit ? -NAV_HEIGHT : 0),
       animationProgress: new Animated.Value(0),
       animationFromIndex: 0,
       animationToIndex: 0,
+      navBarOpacity: new Animated.Value(props.isHiddenOnInit ? 0 : 1),
+      navBarYPos: new Animated.Value(props.isHiddenOnInit ? -NAV_HEIGHT : 0),
+      navBarWidth: SCREEN_WIDTH,
+      navBarHeight: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
+        (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
+      prevLeftPartWidth: null,
+      leftPartWidth: 0,
+      prevRightPartWidth: null,
+      rightPartWidth: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
-      titleWidth: 0,
       backIconWidth: 0,
-      width: SCREEN_WIDTH,
-      height: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
-        (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
-    }
+    };
   }
 
   _setTitle(title) {
@@ -89,7 +106,7 @@ export default class NavBar extends React.Component {
     this.state = Object.assign({}, this.state, {
       animationFromIndex: fromIndex,
       animationToIndex: toIndex,
-    })
+    });
 
     this.state.animationProgress.setValue(progress);
 
@@ -98,30 +115,33 @@ export default class NavBar extends React.Component {
 
   immediatelyRefresh() {
     this.setState({
-      opacity: new Animated.Value(this.props.isHiddenOnInit ? 0 : 1),
-      y: new Animated.Value(this.props.isHiddenOnInit ? -NAV_HEIGHT : 0),
       animationProgress: new Animated.Value(0),
       animationFromIndex: 0,
       animationToIndex: 0,
+      navBarOpacity: new Animated.Value(this.props.isHiddenOnInit ? 0 : 1),
+      navBarYPos: new Animated.Value(this.props.isHiddenOnInit ? -NAV_HEIGHT : 0),
+      prevLeftPartWidth: null,
+      leftPartWidth: 0,
+      prevRightPartWidth: null,
+      rightPartWidth: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
-      titleWidth: 0,
       backIconWidth: 0,
     });
   }
 
   show(type = 'fade') {
     if (type === 'fade') {
-      this.state.y.setValue(0);
+      this.state.navBarYPos.setValue(0);
 
-      Animated.timing(this.state.opacity, {
+      Animated.timing(this.state.navBarOpacity, {
         toValue: 1,
         duration: 200,
       }).start();
     } else if (type === 'slide') {
-      this.state.opacity.setValue(1);
+      this.state.navBarOpacity.setValue(1);
 
-      Animated.timing(this.state.y, {
+      Animated.timing(this.state.navBarYPos, {
         toValue: 0,
         duration: 100,
       }).start();
@@ -130,26 +150,44 @@ export default class NavBar extends React.Component {
 
   hide(type = 'fade') {
     if (type === 'fade') {
-      Animated.timing(this.state.opacity, {
+      Animated.timing(this.state.navBarOpacity, {
         toValue: 0,
         duration: 200,
       }).start(() => {
-        this.state.y.setValue(-NAV_HEIGHT);
+        this.state.navBarYPos.setValue(-NAV_HEIGHT);
       });
     } else if (type === 'slide') {
-      Animated.timing(this.state.y, {
+      Animated.timing(this.state.navBarYPos, {
         toValue: -NAV_HEIGHT,
         duration: 100,
       }).start(() => {
-        this.state.opacity.setValue(0);
+        this.state.navBarOpacity.setValue(0);
       });
     }
   }
 
-  _onBackIconLayout = (e) => {
+  _onPrevLeftPartLayout = (e) => {
     this.setState({
-      backIconWidth: e.nativeEvent.layout.width,
-    })
+      prevLeftPartWidth: e.nativeEvent.layout.width,
+    });
+  };
+
+  _onLeftPartLayout = (e) => {
+    this.setState({
+      leftPartWidth: e.nativeEvent.layout.width,
+    });
+  };
+
+  _onPrevRightPartLayout = (e) => {
+    this.setState({
+      prevRightPartWidth: e.nativeEvent.layout.width,
+    });
+  };
+
+  _onRightPartLayout = (e) => {
+    this.setState({
+      rightPartWidth: e.nativeEvent.layout.width,
+    });
   };
 
   _onPrevTitleLayout = (e) => {
@@ -158,23 +196,22 @@ export default class NavBar extends React.Component {
     this.setState({
       prevTitleWidth: layout.width,
       prevTitleXPos: layout.x,
-    })
+    });
   };
 
-  _onTitleLayout = (e) => {
+  _onBackIconLayout = (e) => {
     const { layout } = e.nativeEvent;
-
     this.setState({
-      titleWidth: layout.width,
-    })
-  }
+      backIconWidth: layout.width,
+    });
+  };
 
   _onNavBarLayout = (e) => {
     const { layout } = e.nativeEvent;
 
     this.setState({
-      width: layout.width,
-      height: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
+      navBarWidth: layout.width,
+      navBarHeight: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
         (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
     });
   };
@@ -190,13 +227,16 @@ export default class NavBar extends React.Component {
 
     const {
       animationProgress,
-      y,
-      opacity,
-      width,
-      height,
+      navBarYPos,
+      navBarOpacity,
+      navBarWidth,
+      navBarHeight,
+      prevLeftPartWidth,
+      leftPartWidth,
+      prevRightPartWidth,
+      rightPartWidth,
       prevTitleXPos,
       prevTitleWidth,
-      titleWidth,
       backIconWidth,
     } = this.state;
 
@@ -222,14 +262,10 @@ export default class NavBar extends React.Component {
           top: 0,
           bottom: 0,
         },
-      })
+      });
     } else {
       underlay = null;
     }
-
-    const leftPartWidth = IS_IOS ? width / 4 : 48;
-    const rightPartWidth = width / (IS_IOS ? 4 : 3);
-    const titlePartWidth = width - leftPartWidth - rightPartWidth;
 
     const routeStack = navState.routeStack;
 
@@ -298,68 +334,6 @@ export default class NavBar extends React.Component {
       (getOrientation() === 'PORTRAIT' ? 32 : 26) :
       24;
 
-    if (leftPart && leftPart.isBackBtn) {
-      backBtn = (
-        <Animated.View
-          style={[
-            styles.animatedWrapper,
-            {
-              opacity: animationProgress.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
-              }),
-            },
-          ]}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={leftPart.onPress}
-            hitSlop={{
-              left: 10,
-              top: 0,
-              right: 0,
-              bottom: 0,
-            }}>
-            {backIcon ||
-              <Ionicon
-                style={styles.backBtnIcon}
-                onLayout={this._onBackIconLayout}
-                name={backIconName}
-                size={backIconSize}
-                color={
-                  leftPart.textStyle.color ||
-                  NAV_BAR_DEFAULT_TINT_COLOR} />
-            }
-            {IS_IOS &&
-              <Animated.Text
-                numberOfLines={1}
-                allowFontScaling={false}
-                style={[
-                  styles.backBtnText,
-                  leftPart.textStyle,
-                  {
-                    width: leftPartWidth - backIconWidth - 10 - 2 - 10,
-                    transform: [
-                      {
-                        translateX: animationProgress.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: isGoingBack ?
-                            [2, leftPartWidth + Math.abs(prevTitleXPos) - (backIconWidth + 10 + 2)] :
-                            [leftPartWidth + Math.abs(prevTitleXPos) - (backIconWidth + 10 + 2), 2],
-                        }),
-                      },
-                    ],
-                  },
-                ]}>
-                {leftPart.text}
-              </Animated.Text>
-            }
-          </TouchableOpacity>
-        </Animated.View>
-      )
-
-      leftPart = null;
-    }
-
     if (prevLeftPart && prevLeftPart.isBackBtn) {
       prevBackBtn = (
         <Animated.View
@@ -379,7 +353,8 @@ export default class NavBar extends React.Component {
                 outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
               }),
             },
-          ]}>
+          ]}
+        >
           <TouchableOpacity
             style={styles.backBtn}
             onPress={prevLeftPart.onPress}
@@ -388,7 +363,8 @@ export default class NavBar extends React.Component {
               top: 0,
               right: 0,
               bottom: 0,
-            }}>
+            }}
+          >
             {backIcon ||
               <Ionicon
                 style={styles.backBtnIcon}
@@ -397,7 +373,8 @@ export default class NavBar extends React.Component {
                 size={backIconSize}
                 color={
                   prevLeftPart.textStyle.color ||
-                  NAV_BAR_DEFAULT_TINT_COLOR} />
+                  NAV_BAR_DEFAULT_TINT_COLOR}
+              />
             }
             {IS_IOS &&
               <Animated.Text
@@ -407,31 +384,214 @@ export default class NavBar extends React.Component {
                   styles.backBtnText,
                   prevLeftPart.textStyle,
                   {
-                    width: leftPartWidth - backIconWidth - 10 - 2 - 10,
                     transform: [
                       {
                         translateX: animationProgress.interpolate({
                           inputRange: [0, 1],
-                          outputRange: isGoingBack ? [-leftPartWidth, 2] : [2, -leftPartWidth / 2],
+                          outputRange: isGoingBack ? [-leftPartWidth, 0] : [0, -leftPartWidth],
                         }),
                       },
                     ],
                   },
-                ]}>
+                ]}
+              >
                 {prevLeftPart.text}
               </Animated.Text>
             }
           </TouchableOpacity>
         </Animated.View>
-      )
+      );
 
       prevLeftPart = null;
     }
 
-    let rightPart =
+    if (leftPart && leftPart.isBackBtn) {
+      backBtn = (
+        <Animated.View
+          style={[
+            styles.animatedWrapper,
+            {
+              opacity: animationProgress.interpolate({
+                inputRange: [0, 0.8, 1],
+                outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
+              }),
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={leftPart.onPress}
+            hitSlop={{
+              left: 10,
+              top: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          >
+            {backIcon ||
+              <Ionicon
+                style={styles.backBtnIcon}
+                onLayout={this._onBackIconLayout}
+                name={backIconName}
+                size={backIconSize}
+                color={
+                  leftPart.textStyle.color ||
+                  NAV_BAR_DEFAULT_TINT_COLOR}
+              />
+            }
+            {IS_IOS &&
+              <Animated.Text
+                numberOfLines={1}
+                allowFontScaling={false}
+                style={[
+                  styles.backBtnText,
+                  leftPart.textStyle,
+                  {
+                    transform: [
+                      {
+                        translateX: animationProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: isGoingBack ?
+                          [
+                            0,
+                            prevTitleXPos -
+                            (PADDING_HORIZONTAL + (style.paddingHorizontal || 0) + backIconWidth),
+                          ] :
+                          [
+                            prevTitleXPos -
+                            (PADDING_HORIZONTAL + (style.paddingHorizontal || 0) + backIconWidth),
+                            0,
+                          ],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                {leftPart.text}
+              </Animated.Text>
+            }
+          </TouchableOpacity>
+        </Animated.View>
+      );
+
+      leftPart = null;
+    }
+
+    const rightPart =
       route && routeMapper.RightPart((route || prevRoute), navigator) || null;
-    let prevRightPart =
+    const prevRightPart =
       prevRoute && routeMapper.RightPart((prevRoute || route), navigator) || null;
+
+    const prevTitlePartWidth =
+      navBarWidth - (prevLeftPartWidth + prevRightPartWidth + (style.paddingHorizontal || 0));
+
+    const prevTitlePart = prevTitle ?
+      (<View
+        style={styles.titlePart}
+        pointerEvents={'box-none'}
+      >
+        <Animated.View
+          style={[
+            styles.animatedWrapper,
+            {
+              paddingHorizontal: IS_IOS ?
+                Math.max(prevLeftPartWidth, prevRightPartWidth) +
+                (style.paddingHorizontal || 0) :
+                0,
+              alignItems: IS_IOS ? 'center' : 'flex-start',
+              transform: [
+                {
+                  translateX: IS_IOS ? animationProgress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange:
+                      isGoingBack ?
+                      [
+                        prevTitlePartWidth - prevTitleWidth > 0 ?
+                          -(prevLeftPartWidth + ((prevTitlePartWidth - prevTitleWidth) / 2)) +
+                           (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
+                           : 0,
+                        0,
+                      ] :
+                      [
+                        0,
+                        prevTitlePartWidth - prevTitleWidth > 0 ?
+                          -(prevLeftPartWidth + ((prevTitlePartWidth - prevTitleWidth) / 2)) +
+                           (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
+                           : 0,
+                      ],
+                  }) : 0,
+                },
+                {
+                  translateY: animationProgress.interpolate({
+                    inputRange: [0, 0.999, 1],
+                    outputRange:
+                      isGoingBack ?
+                        [0, 0, 0] :
+                        [0, 0, -SCREEN_WIDTH],
+                  }),
+                },
+              ],
+              opacity: animationProgress.interpolate({
+                inputRange: [0, 1],
+                outputRange: isGoingBack ? [0, 1] : [1, 0],
+              }),
+            },
+          ]}
+        >
+          <View
+            onLayout={IS_IOS ? this._onPrevTitleLayout : null}
+          >
+            {prevTitle}
+          </View>
+        </Animated.View>
+      </View>) :
+      null;
+
+    const titlePart = title && animationFromIndex !== animationToIndex ?
+      (<View
+        style={styles.titlePart}
+        pointerEvents={'box-none'}
+      >
+        <Animated.View
+          style={[
+            styles.animatedWrapper,
+            {
+              paddingHorizontal: IS_IOS ?
+                Math.max(leftPartWidth, rightPartWidth) +
+                (style.paddingHorizontal || 0) :
+                0,
+              alignItems: IS_IOS ? 'center' : 'flex-start',
+              transform: IS_IOS ? [
+                {
+                  translateX: animationProgress.interpolate({
+                    inputRange: [0, 0.999, 1],
+                    outputRange:
+                      isGoingBack ?
+                      [
+                        0,
+                        (navBarWidth / 2) + (navBarWidth * 0.2),
+                        -SCREEN_WIDTH,
+                      ] :
+                      [
+                        (navBarWidth / 2) + (navBarWidth * 0.2),
+                        0,
+                        0,
+                      ],
+                  }),
+                },
+              ] : [],
+              opacity: animationProgress.interpolate({
+                inputRange: [0, 0.66, 1],
+                outputRange: isGoingBack ? [1, 0, 0] : [0, 0.2, 1],
+              }),
+            },
+          ]}
+        >
+          {title}
+        </Animated.View>
+      </View>) :
+      null;
 
     return (
       <Animated.View
@@ -441,223 +601,160 @@ export default class NavBar extends React.Component {
           styles.navBar,
           navBarBackgroundColorStyle,
           {
-            height,
-            opacity: isGoingBack &&
+            height: navBarHeight,
+            opacity: isGoingBack && prevRoute.component &&
                     getNavigationDelegate(prevRoute.component) &&
                     getNavigationDelegate(prevRoute.component).navBarIsHidden ?
               animationProgress.interpolate({
                 inputRange: [0, 0.5, 1],
                 outputRange: [1, 0, 0],
               }) :
-              opacity,
+              navBarOpacity,
             transform: [
               {
-                translateY: y,
+                translateY: navBarYPos,
               },
             ],
           },
-        ]}>
+        ]}
+      >
+
         {navBarBackgroundColor !== 'transparent' ? underlay : null}
-        <View style={{
-          flex: 1,
-          marginTop: getOrientation() === 'PORTRAIT' ?
-            NAV_BAR_STYLES.General.StatusBarHeight :
-            0,
-        }}>
-        <View
+
+        <View // PREV LAYER
           style={[
-            styles.titleContainer,
-            {
-              left: IS_IOS ? (width - titlePartWidth) / 2 : leftPartWidth + 10,
-              width: titlePartWidth,
-              height: getOrientation() === 'PORTRAIT' ?
-                height - NAV_BAR_STYLES.General.StatusBarHeight :
-                height,
-            },
-          ]}>
-            {prevTitle ?
+            styles.layer,
+            style.paddingHorizontal ? {
+              paddingHorizontal: style.paddingHorizontal,
+            } : {},
+          ]}
+          pointerEvents={'box-none'}
+        >
+          {IS_IOS && prevTitlePart}
+          {prevLeftPart || prevBackBtn ?
+            <View
+              style={styles.leftPartContainer}
+              pointerEvents={'box-none'}
+              onLayout={IS_IOS ? this._onPrevLeftPartLayout : null}
+            >
+              {prevLeftPart ?
+                <Animated.View
+                  style={[
+                    styles.animatedWrapper,
+                    {
+                      alignItems: 'flex-start',
+                      opacity: animationProgress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: isGoingBack ? [0, 1] : [1, 0],
+                      }),
+                      transform: [
+                        {
+                          translateY: animationProgress.interpolate({
+                            inputRange: [0, 0.999, 1],
+                            outputRange:
+                              isGoingBack ?
+                               [0, 0, 0] :
+                               [0, 0, -SCREEN_WIDTH],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                >
+                  {prevLeftPart}
+                </Animated.View> :
+                null
+              }
+              {prevBackBtn}
+            </View> :
+            null
+          }
+          {!IS_IOS && prevTitlePart}
+          {prevRightPart ?
+            <View
+              style={styles.rightPartContainer}
+              pointerEvents={'box-none'}
+              onLayout={IS_IOS ? this._onPrevRightPartLayout : null}
+            >
               <Animated.View
                 style={[
                   styles.animatedWrapper,
                   {
-                    transform: IS_IOS ? [
-                      {
-                        translateX: animationProgress.interpolate({
-                          inputRange: [0, 1],
-                          outputRange:
-                            isGoingBack ?
-                              [
-                                titlePartWidth - prevTitleWidth > 0 ?
-                                  -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2) : 0,
-                                0,
-                              ] :
-                              [
-                                0,
-                                titlePartWidth - prevTitleWidth > 0 ?
-                                  -(leftPartWidth + ((titlePartWidth - prevTitleWidth) / 2)) + (backIconWidth + 10 + 2) : 0,
-                              ],
-                        }),
-                      },
-                    ] : [],
-                    opacity: animationProgress.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
-                    }),
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    width: titlePartWidth,
-                    alignItems: IS_IOS ? 'center' : 'flex-start',
-                  }}>
-                  <View
-                    onLayout={IS_IOS ? this._onPrevTitleLayout : null}>
-                    {prevTitle}
-                  </View>
-                </View>
-              </Animated.View> :
-              null
-            }
-            {title && animationFromIndex !== animationToIndex ?
-              <Animated.View
-                style={[
-                  styles.animatedWrapper,
-                  {
-                    justifyContent: IS_IOS ? 'center' : 'flex-start',
-                    transform: IS_IOS ? [
-                      {
-                        translateX: animationProgress.interpolate({
-                          inputRange: [0, 0.999, 1],
-                          outputRange:
-                            isGoingBack ?
-                              [0, (leftPartWidth + ((titlePartWidth - titleWidth) / 2)) + (backIconWidth + 10 + 2), -SCREEN_WIDTH] :
-                              [(leftPartWidth + ((titlePartWidth - titleWidth) / 2)) + (backIconWidth + 10 + 2), 0, 0],
-                        }),
-                      },
-                    ] : [],
-                    opacity: animationProgress.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
-                    }),
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    width: titlePartWidth,
-                    alignItems: IS_IOS ? 'center' : 'flex-start',
-                  }}>
-                  <View
-                    onLayout={IS_IOS ? this._onTitleLayout : null}>
-                    {title}
-                  </View>
-                </View>
-              </Animated.View> :
-              null
-            }
-        </View>
-
-        {prevLeftPart || (leftPart && animationFromIndex !== animationToIndex) ||
-         prevBackBtn || backBtn ?
-         <View
-           style={[
-             styles.navBarLeftPartContainer,
-             {
-               width: leftPartWidth,
-               height: getOrientation() === 'PORTRAIT' ?
-                 height - NAV_BAR_STYLES.General.StatusBarHeight :
-                 height,
-             },
-           ]}>
-           {prevLeftPart ?
-             <Animated.View
-               style={[
-                 styles.animatedWrapper,
-                 {
-                   opacity: animationProgress.interpolate({
-                     inputRange: [0, 1],
-                     outputRange: isGoingBack ? [0, 1] : [1, 0],
-                   }),
-                 },
-               ]}
-             >
-               <View
-                 style={{
-                   flex: 1,
-                   alignItems: 'flex-start',
-                 }}>
-                 {prevLeftPart}
-               </View>
-             </Animated.View> :
-             null
-           }
-           {leftPart && animationFromIndex !== animationToIndex ?
-             <Animated.View
-               style={[
-                 styles.animatedWrapper,
-                 {
-                   opacity: animationProgress.interpolate({
-                     inputRange: [0, 1],
-                     outputRange: isGoingBack ? [1, 0] : [0, 1],
-                   }),
-                 },
-               ]}
-             >
-               <View
-                 style={{
-                   flex: 1,
-                   alignItems: 'flex-start',
-                 }}>
-                 {leftPart}
-               </View>
-             </Animated.View> :
-             null
-           }
-           {backBtn}
-           {prevBackBtn}
-         </View> :
-         null
-        }
-
-        {prevRightPart || (rightPart && animationFromIndex !== animationToIndex) ?
-          <View
-            style={[
-              styles.navBarRightPartContainer,
-              {
-                width: rightPartWidth,
-                height: getOrientation() === 'PORTRAIT' ?
-                  height - NAV_BAR_STYLES.General.StatusBarHeight :
-                  height,
-              },
-            ]}>
-            {prevRightPart ?
-              <Animated.View
-                style={[
-                  styles.animatedWrapper,
-                  {
+                    alignItems: 'flex-end',
                     opacity: animationProgress.interpolate({
                       inputRange: [0, 1],
                       outputRange: isGoingBack ? [0, 1] : [1, 0],
                     }),
+                    transform: [
+                      {
+                        translateY: animationProgress.interpolate({
+                          inputRange: [0, 0.999, 1],
+                          outputRange:
+                            isGoingBack ?
+                              [0, 0, 0] :
+                              [0, 0, -SCREEN_WIDTH],
+                        }),
+                      },
+                    ],
                   },
                 ]}
               >
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'flex-end',
-                  }}>
-                  {prevRightPart}
-                </View>
-              </Animated.View> :
-              null
-            }
-            {rightPart && animationFromIndex !== animationToIndex ?
+                {prevRightPart}
+              </Animated.View>
+            </View> :
+          null
+         }
+        </View>
+
+        <View // LAYER
+          style={[
+            styles.layer,
+            style.paddingHorizontal ? {
+              paddingHorizontal: style.paddingHorizontal,
+            } : {},
+          ]}
+          pointerEvents={'box-none'}
+        >
+          {IS_IOS && titlePart}
+          {(leftPart && animationFromIndex !== animationToIndex) || backBtn ?
+            <View
+              style={styles.leftPartContainer}
+              pointerEvents={'box-none'}
+              onLayout={IS_IOS ? this._onLeftPartLayout : null}
+            >
+              {leftPart && animationFromIndex !== animationToIndex ?
+                <Animated.View
+                  style={[
+                    styles.animatedWrapper,
+                    {
+                      alignItems: 'flex-start',
+                      opacity: animationProgress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: isGoingBack ? [1, 0] : [0, 1],
+                      }),
+                    },
+                  ]}
+                >
+                  {leftPart}
+                </Animated.View> :
+                null
+              }
+              {backBtn}
+            </View> :
+            null
+          }
+          {!IS_IOS && titlePart}
+          {rightPart && animationFromIndex !== animationToIndex ?
+            <View
+              style={styles.rightPartContainer}
+              pointerEvents={'box-none'}
+              onLayout={IS_IOS ? this._onRightPartLayout : null}
+            >
               <Animated.View
                 style={[
                   styles.animatedWrapper,
                   {
+                    alignItems: 'flex-end',
                     opacity: animationProgress.interpolate({
                       inputRange: [0, 1],
                       outputRange: isGoingBack ? [1, 0] : [0, 1],
@@ -665,37 +762,15 @@ export default class NavBar extends React.Component {
                   },
                 ]}
               >
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'flex-end',
-                  }}>
-                  {rightPart}
-                </View>
-              </Animated.View> :
-              null
-            }
-          </View> :
-          null
-        }
+                {rightPart}
+              </Animated.View>
+            </View> :
+            null
+          }
         </View>
       </Animated.View>
-    )
+    );
   }
-
-  static propTypes = {
-    style: View.propTypes.style,
-    isHiddenOnInit: PropTypes.bool,
-    navState: Navigator.NavigationBar.propTypes.navState,
-    routeMapper: PropTypes.shape({
-      Title: PropTypes.func.isRequired,
-      LeftPart: PropTypes.func.isRequired,
-      RightPart: PropTypes.func.isRequired,
-      navBarBackgroundColor: PropTypes.func.isRequired,
-    }).isRequired,
-    underlay: PropTypes.object,
-    backIcon: PropTypes.object,
-  };
 }
 
 const styles = StyleSheet.create({
@@ -706,42 +781,51 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
   },
-  titleContainer: {
-    position: 'absolute',
-  },
-  animatedWrapper: {
+  layer: {
     position: 'absolute',
     left: 0,
-    top: 0,
     right: 0,
+    top: 0,
     bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: getOrientation() === 'PORTRAIT' ?
+      NAV_BAR_STYLES.General.StatusBarHeight :
+      0,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  animatedWrapper: {
+    flex: 1,
+    justifyContent: 'center',
     backgroundColor: 'transparent',
   },
-  navBarLeftPartContainer: {
-    position: 'absolute',
-    left: 10,
-    height: NAV_BAR_STYLES.General.NavBarHeight,
+  leftPartContainer: {
+    paddingLeft: PADDING_HORIZONTAL,
   },
-  navBarRightPartContainer: {
+  titlePart: IS_IOS ? {
     position: 'absolute',
-    right: 10,
-    height: NAV_BAR_STYLES.General.NavBarHeight,
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  } : {
+    flex: 1,
+    paddingLeft: 10,
+  },
+  rightPartContainer: {
+    paddingRight: PADDING_HORIZONTAL,
   },
   backBtn: {
     flex: 1,
     flexDirection: 'row',
-    paddingRight: 10,
     alignItems: 'center',
     justifyContent: IS_IOS ? 'flex-start' : 'center',
   },
   backBtnText: {
     fontSize: 16,
     backgroundColor: 'transparent',
+    paddingHorizontal: 2,
   },
   backBtnIcon: {
     top: 1,
   },
-})
+});
