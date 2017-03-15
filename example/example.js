@@ -1,7 +1,5 @@
 import YANavigator from 'react-native-ya-navigator';
 
-import { BlurView } from 'react-native-blur';
-
 import React, { PropTypes } from 'react';
 
 import {
@@ -10,8 +8,7 @@ import {
   View,
   StatusBar,
   Navigator,
-  ActivityIndicatorIOS,
-  ProgressBarAndroid,
+  ActivityIndicator,
   ScrollView,
   TouchableOpacity,
   Image,
@@ -34,7 +31,6 @@ export default class YANavigatorExample extends React.Component {
             color: '#fff',
           },
         }}
-        navBarUnderlay={Platform.OS === 'ios' ? <BlurView blurType={'light'}/> : null}
       />
     );
   }
@@ -83,7 +79,7 @@ class View1 extends React.Component {
           animated={true}
           backgroundColor={'green'}/>
         <Image
-          source={{uri: 'http://d3j01a5c2bpp4t.cloudfront.net/wp-content/uploads/2015/03/reactive-native.png'}}
+          source={{uri: 'https://developer-tech.com/media/img/news/reactive-nativingitup.png.800x600_q96.png'}}
           resizeMode={'contain'}
           style={{height: 150, width: 300}}/>
         <Text style={styles.welcome}>
@@ -174,9 +170,7 @@ class View2NavBarRightBtn extends React.Component {
     return (
       <TouchableOpacity onPress={this.props.onPress}>
         {this.state.fetching ?
-          (Platform.OS === 'ios' ?
-            <ActivityIndicatorIOS color={'#fff'}/> :
-            <ProgressBarAndroid color={'#fff'} styleAttr={'Small'}/>) :
+          <ActivityIndicator color={'#fff'}/> :
           <Text style={{fontSize: 16, color: '#fff'}}>{this.props.text}</Text>
         }
       </TouchableOpacity>
@@ -209,7 +203,7 @@ class View2 extends React.Component {
       this.setState({
         titlePressCount: ++this.state.titlePressCount,
       }, () => {
-        this.props.navigator._navBar.refs.title.setState({
+        this.props.navigator._navBar.refs.view2_title.setState({
           text: `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}`,
         })
       })
@@ -246,12 +240,12 @@ class View2 extends React.Component {
             this.setState({
               fetching: !this.state.fetching,
             }, () => {
-              this.props.navigator._navBar.refs.rightPart
+              this.props.navigator._navBar.refs.view2_rightPart
               .setState({
                 fetching: this.state.fetching,
               })
 
-              this.props.navigator._navBar.refs.title
+              this.props.navigator._navBar.refs.view2_title
               .setState({
                 text: this.state.fetching ?
                   'Fetching...' :
@@ -266,15 +260,16 @@ class View2 extends React.Component {
           onPress={() => {
             this.props.navigator._navBar.updateUI({
               title: <View2NavBarTitle
-                text={this.props.navigator._navBar.refs.title.state.text}
+                text={this.props.navigator._navBar.refs.view2_title.state.text}
                 onPress={() => 'onNavBarTitlePress'}
                 />,
             });
 
             this.props.navigator.push({
               component: View3,
-            }
-          )}}>
+            });
+          }}
+        >
           {'Push view without NavBar'}
         </Text>
       </YANavigator.Scene>
@@ -333,7 +328,7 @@ class View3 extends React.Component {
   }
 }
 
-class View4NAvBarLogo extends React.Component {
+class View4NavBarLogo extends React.Component {
   constructor() {
     super();
 
@@ -352,7 +347,7 @@ class View4NAvBarLogo extends React.Component {
   render() {
     return (
       <Animated.Image
-        source={{uri: 'http://daynin.github.io/clojurescript-presentation/img/react-logo.png'}}
+        source={{uri: 'https://ih1.redbubble.net/image.32576156.9850/sticker,375x360.png'}}
         resizeMode={'contain'}
         style={{
           height: 40,
@@ -391,7 +386,7 @@ class View4 extends React.Component {
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.refs.title.animate();
+            this.props.navigator._navBar.refs.view4_title.animate();
           }}>
           {'Animate logo'}
         </Text>
@@ -431,11 +426,15 @@ class View4 extends React.Component {
     id: 'view4',
     navBarBackgroundColor: 'red',
     renderTitle() {
-      return View4NAvBarLogo
+      return View4NavBarLogo
     },
     renderNavBarRightPart() {
       return (
-        <View style={{backgroundColor: '#fff'}}>
+        <View style={{
+          backgroundColor: '#fff',
+          width: 100,
+          alignItems: 'center',
+        }}>
           <Text style={{color: '#000', fontSize: 16}}>
             {'Absolutely Any VIEW'}
           </Text>
@@ -487,11 +486,7 @@ class View5 extends React.Component {
     id: 'view5',
     navBarBackgroundColor: 'rgba(0, 0, 0, 0.2)',
     renderNavBarLeftPart() {
-      return (
-        Platform.OS === 'ios' ?
-        <ActivityIndicatorIOS color={'#000'} /> :
-        <ProgressBarAndroid color={'#000'} styleAttr={'Small'}/>
-      )
+      return (<ActivityIndicator color={'#000'} />)
     },
     renderTitle() {
       return (
