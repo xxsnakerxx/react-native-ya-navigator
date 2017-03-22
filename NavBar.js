@@ -361,7 +361,7 @@ export default class NavBar extends React.Component {
             hitSlop={{
               left: 10,
               top: 0,
-              right: 0,
+              right: 10,
               bottom: 0,
             }}
           >
@@ -424,7 +424,7 @@ export default class NavBar extends React.Component {
             hitSlop={{
               left: 10,
               top: 0,
-              right: 0,
+              right: 10,
               bottom: 0,
             }}
           >
