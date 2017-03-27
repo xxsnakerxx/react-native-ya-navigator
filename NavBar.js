@@ -231,13 +231,16 @@ export default class NavBar extends React.Component {
       navBarOpacity,
       navBarWidth,
       navBarHeight,
+      prevTitleXPos,
+      prevTitleWidth,
+      backIconWidth,
+    } = this.state;
+
+    let {
       prevLeftPartWidth,
       leftPartWidth,
       prevRightPartWidth,
       rightPartWidth,
-      prevTitleXPos,
-      prevTitleWidth,
-      backIconWidth,
     } = this.state;
 
     let {
@@ -307,6 +310,14 @@ export default class NavBar extends React.Component {
     const prevTitle =
       prevRoute && routeMapper.Title((prevRoute || route), navigator) || null;
 
+    let prevLeftPart =
+      prevRoute && routeMapper.LeftPart(
+        prevRoute || route,
+        navigator,
+        isGoingBack ? animationToIndex  : animationFromIndex,
+        navState
+      ) || null;
+
     let leftPart =
       route && routeMapper.LeftPart(
         route || prevRoute,
@@ -315,13 +326,8 @@ export default class NavBar extends React.Component {
         navState
       ) || null;
 
-    let prevLeftPart =
-      prevRoute && routeMapper.LeftPart(
-        prevRoute || route,
-        navigator,
-        isGoingBack ? animationToIndex  : animationFromIndex,
-        navState
-      ) || null;
+    prevLeftPartWidth = prevLeftPart ? prevLeftPartWidth : 0;
+    leftPartWidth = leftPart ? leftPartWidth : 0;
 
     let backBtn;
     let prevBackBtn;
@@ -478,10 +484,13 @@ export default class NavBar extends React.Component {
       leftPart = null;
     }
 
-    const rightPart =
-      route && routeMapper.RightPart((route || prevRoute), navigator) || null;
     const prevRightPart =
       prevRoute && routeMapper.RightPart((prevRoute || route), navigator) || null;
+    const rightPart =
+      route && routeMapper.RightPart((route || prevRoute), navigator) || null;
+
+    prevRightPartWidth = prevRightPart ? prevRightPartWidth : 0;
+    rightPartWidth = rightPart ? rightPartWidth : 0;
 
     const prevTitlePartWidth =
       navBarWidth - (prevLeftPartWidth + prevRightPartWidth + (style.paddingHorizontal || 0));
@@ -508,7 +517,7 @@ export default class NavBar extends React.Component {
                       isGoingBack ?
                       [
                         prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -(prevLeftPartWidth + ((prevTitlePartWidth - prevTitleWidth) / 2)) +
+                          -((prevTitlePartWidth - prevTitleWidth) / 2) +
                            (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
                            : 0,
                         0,
@@ -516,7 +525,7 @@ export default class NavBar extends React.Component {
                       [
                         0,
                         prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -(prevLeftPartWidth + ((prevTitlePartWidth - prevTitleWidth) / 2)) +
+                          -((prevTitlePartWidth - prevTitleWidth) / 2) +
                            (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
                            : 0,
                       ],
