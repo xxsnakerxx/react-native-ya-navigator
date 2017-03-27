@@ -459,9 +459,9 @@ export default class YANavigator extends React.Component {
         for (let i = state.routeStack.length - 1; i > index; i--) {
           if (state.routeStack[i] &&
               state.routeStack[i].props &&
-              state.routeStack[i].props.onBlur) {
+              state.routeStack[i].props.onSceneWillBlur) {
 
-            state.routeStack[i].props.onBlur(
+            state.routeStack[i].props.onSceneWillBlur(
               route.__navigatorRouteID !== undefined
             );
           }

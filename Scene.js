@@ -35,7 +35,7 @@ export default class Scene extends React.Component {
         const navigationDelegateCopy = Object.assign({},
           delegate.constructor.navigationDelegate)
 
-        const navigationEvents = ['willfocus', 'didfocus'];
+        const navigationEvents = ['onSceneWillFocus', 'onSceneDidFocus'];
 
         navigationEvents.forEach((eventName) =>
           this._addListener(eventName, delegate))

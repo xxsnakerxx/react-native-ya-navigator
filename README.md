@@ -169,7 +169,7 @@ Also `YANavigator.Scene` has `style` prop and `paddingTop` (if it's true(__defau
 
 And one more thing... ;-)
 
-You can listen when a scene will lose focus via route prop `onBlur`
+You can listen when a scene will lose focus via route prop `onSceneWillBlur`
 
 ```javascript
 ...
@@ -183,7 +183,7 @@ onLinkPress = (link) => {
       /**
        * @param {Boolean} true means the scene was popped, false means a new scene was pushed
        */
-      onBlur: (isBack) => tabBar.show(),
+      onSceneWillBlur: (isBack) => tabBar.show(),
     },
   })
 }
@@ -228,13 +228,13 @@ class MyScene extends React.Component {
   }
 
   // Note:
-  // 'willfocus' fires before scene was mounted 
+  // 'onSceneWillFocus' fires before scene was mounted
   // so if you want to listen when scene will get focus on 'push' 	// you should use 'componentDidMount' instead
-  willfocus() {
+  onSceneWillFocus() {
     console.log('Scene will focus');
   }
 
-  didfocus() {
+  onSceneDidFocus() {
     console.log('Scene did focus');
   }
 
@@ -273,7 +273,7 @@ There are two options:
 
 1. Each scene can access to navBar items via `ref` and modify its state using standard `setState` method, or can call other methods provided by your component.
 
-   __ref__ generated from the template 
+   __ref__ generated from the template
 
    ```javascript
    const ref = `${navigationDelegate.id || `${navigator.state.presentedIndex + 1}_scene`}_leftPart|rightPart|title`;
