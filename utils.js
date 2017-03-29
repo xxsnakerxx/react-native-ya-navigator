@@ -5,7 +5,8 @@ import {
 } from 'react-native';
 
 const getNavigationDelegate = (component) => {
-  return component.navigationDelegate ||
+  return (component.wrappedComponent && component.wrappedComponent.navigationDelegate) ||
+    component.navigationDelegate ||
     (component.type && component.type.navigationDelegate)
 }
 
