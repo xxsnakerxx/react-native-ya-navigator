@@ -55,23 +55,28 @@ export default class Scene extends React.Component {
 
         const delegateUnmountHandler = delegate.componentWillUnmount;
 
-        delegate.componentWillUnmount = () => {
-          delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
+        Object.defineProperty(delegate, 'componentWillUnmount', {
+          writable: false,
+          configurable: true,
+          enumerable: false,
+          value: () => {
+            delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
 
-          navigationEvents.forEach((eventName) =>
-            this._removeListener(eventName, delegate))
+            navigationEvents.forEach((eventName) =>
+              this._removeListener(eventName, delegate))
 
-          const events = this._events;
+            const events = this._events;
 
-          if (events && events.length) {
-            events.forEach((eventName) => this._removeListener(eventName));
-          }
+            if (events && events.length) {
+              events.forEach((eventName) => this._removeListener(eventName));
+            }
 
-          this._events = null;
+            this._events = null;
 
-          // restore here because we might change it by navBar.updateUI etc...
-          delegate.constructor.navigationDelegate = navigationDelegateCopy;
-        }
+            // restore here because we might change it by navBar.updateUI etc...
+            delegate.constructor.navigationDelegate = navigationDelegateCopy;
+          },
+        });
       }
     }
   }
