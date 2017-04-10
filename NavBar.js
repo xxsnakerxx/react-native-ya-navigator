@@ -461,11 +461,11 @@ export default class NavBar extends React.Component {
                           [
                             0,
                             prevTitleXPos -
-                            (PADDING_HORIZONTAL + (style.paddingHorizontal || 0) + backIconWidth),
+                            (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
                           ] :
                           [
                             prevTitleXPos -
-                            (PADDING_HORIZONTAL + (style.paddingHorizontal || 0) + backIconWidth),
+                            (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
                             0,
                           ],
                         }),
@@ -492,8 +492,10 @@ export default class NavBar extends React.Component {
     prevRightPartWidth = prevRightPart ? prevRightPartWidth : 0;
     rightPartWidth = rightPart ? rightPartWidth : 0;
 
+    const paddingHorizontal = (style && style.paddingHorizontal) || 0;
+
     const prevTitlePartWidth =
-      navBarWidth - (prevLeftPartWidth + prevRightPartWidth + (style.paddingHorizontal || 0));
+      navBarWidth - (prevLeftPartWidth + prevRightPartWidth + paddingHorizontal);
 
     const prevTitlePart = prevTitle ?
       (<View
@@ -505,8 +507,7 @@ export default class NavBar extends React.Component {
             styles.animatedWrapper,
             {
               paddingHorizontal: IS_IOS ?
-                Math.max(prevLeftPartWidth, prevRightPartWidth) +
-                (style.paddingHorizontal || 0) :
+                Math.max(prevLeftPartWidth, prevRightPartWidth) + paddingHorizontal:
                 0,
               alignItems: IS_IOS ? 'center' : 'flex-start',
               transform: [
@@ -518,7 +519,7 @@ export default class NavBar extends React.Component {
                       [
                         prevTitlePartWidth - prevTitleWidth > 0 ?
                           -((prevTitlePartWidth - prevTitleWidth) / 2) +
-                           (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
+                           paddingHorizontal + PADDING_HORIZONTAL + backIconWidth
                            : 0,
                         0,
                       ] :
@@ -526,7 +527,7 @@ export default class NavBar extends React.Component {
                         0,
                         prevTitlePartWidth - prevTitleWidth > 0 ?
                           -((prevTitlePartWidth - prevTitleWidth) / 2) +
-                           (style.paddingHorizontal || 0) + PADDING_HORIZONTAL + backIconWidth
+                           paddingHorizontal + PADDING_HORIZONTAL + backIconWidth
                            : 0,
                       ],
                   }) : 0,
@@ -567,8 +568,7 @@ export default class NavBar extends React.Component {
             styles.animatedWrapper,
             {
               paddingHorizontal: IS_IOS ?
-                Math.max(leftPartWidth, rightPartWidth) +
-                (style.paddingHorizontal || 0) :
+                Math.max(leftPartWidth, rightPartWidth) + paddingHorizontal :
                 0,
               alignItems: IS_IOS ? 'center' : 'flex-start',
               transform: IS_IOS ? [
@@ -633,8 +633,8 @@ export default class NavBar extends React.Component {
         <View // PREV LAYER
           style={[
             styles.layer,
-            style.paddingHorizontal ? {
-              paddingHorizontal: style.paddingHorizontal,
+            paddingHorizontal ? {
+              paddingHorizontal: paddingHorizontal,
             } : {},
           ]}
           pointerEvents={'box-none'}
@@ -718,8 +718,8 @@ export default class NavBar extends React.Component {
         <View // LAYER
           style={[
             styles.layer,
-            style.paddingHorizontal ? {
-              paddingHorizontal: style.paddingHorizontal,
+            paddingHorizontal ? {
+              paddingHorizontal: paddingHorizontal,
             } : {},
           ]}
           pointerEvents={'box-none'}
