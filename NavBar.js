@@ -270,6 +270,8 @@ export default class NavBar extends React.Component {
       underlay = null;
     }
 
+    const paddingHorizontal = (style && style.paddingHorizontal) || 0;
+
     const routeStack = navState.routeStack;
 
     const navBarBackgroundColor =
@@ -491,8 +493,6 @@ export default class NavBar extends React.Component {
 
     prevRightPartWidth = prevRightPart ? prevRightPartWidth : 0;
     rightPartWidth = rightPart ? rightPartWidth : 0;
-
-    const paddingHorizontal = (style && style.paddingHorizontal) || 0;
 
     const prevTitlePartWidth =
       navBarWidth - (prevLeftPartWidth + prevRightPartWidth + paddingHorizontal);
