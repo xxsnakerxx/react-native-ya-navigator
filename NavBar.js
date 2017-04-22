@@ -549,11 +549,19 @@ export default class NavBar extends React.Component {
             },
           ]}
         >
+          {/* for measuring prev title */}
           <View
             onLayout={IS_IOS ? this._onPrevTitleLayout : null}
+            pointerEvents={'none'}
+            style={{
+              opacity: 0,
+              position: 'absolute',
+            }}
           >
             {prevTitle}
           </View>
+
+          {prevTitle}
         </Animated.View>
       </View>) :
       null;
