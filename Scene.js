@@ -33,12 +33,16 @@ export default class Scene extends React.Component {
 
       if (navigationDelegate && navigationDelegate.id) {
         const navigationDelegateCopy = Object.assign({},
-          delegate.constructor.navigationDelegate)
+          delegate.constructor.navigationDelegate);
 
         const navigationEvents = ['onSceneWillFocus', 'onSceneDidFocus'];
 
         navigationEvents.forEach((eventName) =>
-          this._addListener(eventName, delegate))
+          this._addListener(eventName, delegate));
+
+        if (delegate['onSceneWillFocus']) {
+          delegate['onSceneWillFocus']();
+        }
 
         setTimeout(() => {
           const events = delegate.constructor.navigationDelegate._events;
@@ -85,13 +89,22 @@ export default class Scene extends React.Component {
     const navigationContext = delegate.props.navigator.navigationContext;
     const delegateId = delegate.constructor.navigationDelegate.id;
 
+    const formatEventName = (eventName) => {
+      if (eventName === 'onSceneWillFocus') {
+        return 'willfocus';
+      } else if (eventName === 'onSceneDidFocus') {
+        return 'didfocus';
+      }
+
+      return eventName;
+    }
+
     this[`_${eventName}Sub`] = navigationContext.addListener(
-      eventName,
+      formatEventName(eventName),
       ({data: {route, e}}) => {
-        delegateId ===
-        route.component.navigationDelegate.id ?
-          (delegate[eventName] ? delegate[eventName](e) : () => {}) :
-          null
+        if (delegateId === route.component.navigationDelegate.id && delegate[eventName]) {
+          delegate[eventName](e);
+        }
       }
     );
   }

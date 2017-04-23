@@ -227,9 +227,6 @@ class MyScene extends React.Component {
     alert('Right side - second btn press');
   }
 
-  // Note:
-  // 'onSceneWillFocus' fires before scene was mounted
-  // so if you want to listen when scene will get focus on 'push' 	// you should use 'componentDidMount' instead
   onSceneWillFocus() {
     console.log('Scene will focus');
   }
