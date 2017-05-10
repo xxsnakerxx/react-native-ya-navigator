@@ -1,9 +1,6 @@
 import React, { PropTypes } from 'react';
-
-import {
-  View,
-  Navigator,
-} from 'react-native';
+import { View } from 'react-native';
+import { Navigator } from 'react-native-deprecated-custom-components';
 
 export default class Scene extends React.Component {
   componentDidUpdate() {

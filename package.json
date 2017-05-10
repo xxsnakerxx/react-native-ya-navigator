@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/xxsnakerxx/react-native-ya-navigator/issues"
   },
-  "homepage": "https://github.com/xxsnakerxx/react-native-ya-navigator#readme"
+  "homepage": "https://github.com/xxsnakerxx/react-native-ya-navigator#readme",
+  "dependencies": {
+    "react-native-deprecated-custom-components": "^0.1.0"
+  }
 }

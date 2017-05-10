@@ -1,13 +1,12 @@
 import React, { PropTypes } from 'react';
-
 import Ionicon from 'react-native-vector-icons/Ionicons';
-
 import { getNavigationDelegate, getOrientation } from './utils';
+import { Navigator } from 'react-native-deprecated-custom-components';
 
 import {
   View,
+  ViewPropTypes,
   TouchableOpacity,
-  Navigator,
   Animated,
   StyleSheet,
   Dimensions,
@@ -29,7 +28,7 @@ const PADDING_HORIZONTAL = 10;
 
 export default class NavBar extends React.Component {
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
     isHiddenOnInit: PropTypes.bool,
     navState: Navigator.NavigationBar.propTypes.navState,
     routeMapper: PropTypes.shape({
@@ -518,16 +517,16 @@ export default class NavBar extends React.Component {
                       isGoingBack ?
                       [
                         prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -((prevTitlePartWidth - prevTitleWidth) / 2) +
-                           paddingHorizontal + PADDING_HORIZONTAL + backIconWidth
+                          -(prevTitleXPos -
+                          (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
                            : 0,
                         0,
                       ] :
                       [
                         0,
                         prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -((prevTitlePartWidth - prevTitleWidth) / 2) +
-                           paddingHorizontal + PADDING_HORIZONTAL + backIconWidth
+                          -(prevTitleXPos -
+                          (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
                            : 0,
                       ],
                   }) : 0,
@@ -641,9 +640,7 @@ export default class NavBar extends React.Component {
         <View // PREV LAYER
           style={[
             styles.layer,
-            paddingHorizontal ? {
-              paddingHorizontal: paddingHorizontal,
-            } : {},
+            paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}
         >
@@ -726,9 +723,7 @@ export default class NavBar extends React.Component {
         <View // LAYER
           style={[
             styles.layer,
-            paddingHorizontal ? {
-              paddingHorizontal: paddingHorizontal,
-            } : {},
+            paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}
         >

@@ -7,7 +7,6 @@ import {
   Text,
   View,
   StatusBar,
-  Navigator,
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
@@ -15,6 +14,8 @@ import {
   Animated,
   Platform,
 } from 'react-native';
+
+import { Navigator } from 'react-native-deprecated-custom-components';
 
 export default class YANavigatorExample extends React.Component {
   render() {

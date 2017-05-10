@@ -1,16 +1,14 @@
 import React, { PropTypes } from 'react';
-
 import NavBar from './NavBar';
 import Scene from './Scene';
-
 import { getNavigationDelegate, replaceInstanceEventedProps } from './utils';
+import { Navigator } from 'react-native-deprecated-custom-components';
 
 import {
-  View,
   StyleSheet,
-  Navigator,
   Platform,
   BackAndroid,
+  ViewPropTypes,
 } from 'react-native';
 
 const VALID_EVENTED_PROPS = [
@@ -532,14 +530,14 @@ export default class YANavigator extends React.Component {
     initialRouteStack: Navigator.propTypes.initialRouteStack,
     defaultSceneConfig: PropTypes.object,
     useNavigationBar: PropTypes.bool,
-    style: View.propTypes.style,
-    navBarStyle: View.propTypes.style,
+    style: ViewPropTypes.style,
+    navBarStyle: ViewPropTypes.style,
     navBarUnderlay: PropTypes.object,
     navBarBackBtn: PropTypes.shape({
       icon: PropTypes.object,
       textStyle: PropTypes.object,
     }),
-    sceneStyle: View.propTypes.style,
+    sceneStyle: PropTypes.object,
     eachSceneProps: PropTypes.object,
     shouldHandleAndroidBack: PropTypes.bool,
   };
