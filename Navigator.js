@@ -7,7 +7,7 @@ import { Navigator } from 'react-native-deprecated-custom-components';
 import {
   StyleSheet,
   Platform,
-  BackAndroid,
+  BackHandler,
   ViewPropTypes,
 } from 'react-native';
 
@@ -57,7 +57,7 @@ export default class YANavigator extends React.Component {
     this.refs.navigator.setShouldHandleAndroidBack = this.setShouldHandleAndroidBack.bind(this);
 
     if (Platform.OS === 'android') {
-      this._backPressSub = BackAndroid.addEventListener('hardwareBackPress', () => {
+      this._backPressSub = BackHandler.addEventListener('hardwareBackPress', () => {
         if (!this.state.shouldHandleAndroidBack) return false;
 
         const { navigator } = this.refs;
