@@ -681,7 +681,7 @@ export default class NavBar extends React.Component {
               }
               {prevBackBtn}
             </View> :
-            null
+            <View />
           }
           {!IS_IOS && prevTitlePart}
           {prevRightPart ?
@@ -753,7 +753,7 @@ export default class NavBar extends React.Component {
               }
               {backBtn}
             </View> :
-            null
+            <View />
           }
           {!IS_IOS && titlePart}
           {rightPart && animationFromIndex !== animationToIndex ?
