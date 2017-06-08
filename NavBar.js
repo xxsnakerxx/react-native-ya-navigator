@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { getNavigationDelegate, getOrientation } from './utils';
 import { Navigator } from 'react-native-deprecated-custom-components';

@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react';
-import { View } from 'react-native';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, ViewPropTypes } from 'react-native';
 import { Navigator } from 'react-native-deprecated-custom-components';
 
 export default class Scene extends React.Component {
@@ -129,7 +130,7 @@ export default class Scene extends React.Component {
   }
 
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
     paddingTop: PropTypes.bool,
     delegate: (props, propName) => {
       if (props[propName] && !(props[propName] instanceof React.Component)) {
