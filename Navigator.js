@@ -139,6 +139,7 @@ export default class YANavigator extends React.Component {
     navBarBackBtn,
     navBarUnderlay,
   ) {
+    const eventedProps = VALID_EVENTED_PROPS.concat(this.props.customEventedProps);
 
     return (
       <NavBar
@@ -182,7 +183,7 @@ export default class YANavigator extends React.Component {
                     const {reactElement, events} =
                       replaceInstanceEventedProps(
                         child,
-                        VALID_EVENTED_PROPS,
+                        eventedProps,
                         navigationDelegate._events,
                         route,
                         navigator.navigationContext
@@ -198,7 +199,7 @@ export default class YANavigator extends React.Component {
                 const {reactElement, events} =
                   replaceInstanceEventedProps(
                     LeftPart,
-                    VALID_EVENTED_PROPS,
+                    eventedProps,
                     navigationDelegate._events,
                     route,
                     navigator.navigationContext
@@ -217,7 +218,7 @@ export default class YANavigator extends React.Component {
               } else if (typeof LeftPart === 'function') {
                 const props = {};
 
-                LeftPart.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                LeftPart.propTypes && eventedProps.forEach((validProp) => {
                   if (LeftPart.propTypes[validProp]) {
                     const event = `onNavBarLeftPart${validProp.replace(/^on/, '')}`
 
@@ -310,7 +311,7 @@ export default class YANavigator extends React.Component {
                     const {reactElement, events} =
                       replaceInstanceEventedProps(
                         child,
-                        VALID_EVENTED_PROPS,
+                        eventedProps,
                         navigationDelegate._events,
                         route,
                         navigator.navigationContext
@@ -326,7 +327,7 @@ export default class YANavigator extends React.Component {
                 const {reactElement, events} =
                   replaceInstanceEventedProps(
                     RightPart,
-                    VALID_EVENTED_PROPS,
+                    eventedProps,
                     navigationDelegate._events,
                     route,
                     navigator.navigationContext
@@ -345,7 +346,7 @@ export default class YANavigator extends React.Component {
               } else if (typeof RightPart === 'function') {
                 const props = {};
 
-                RightPart.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                RightPart.propTypes && eventedProps.forEach((validProp) => {
                   if (RightPart.propTypes[validProp]) {
                     const event = `onNavBarRightPart${validProp.replace(/^on/, '')}`
 
@@ -388,7 +389,7 @@ export default class YANavigator extends React.Component {
                     const {reactElement, events} =
                       replaceInstanceEventedProps(
                         child,
-                        VALID_EVENTED_PROPS,
+                        eventedProps,
                         navigationDelegate._events,
                         route,
                         navigator.navigationContext
@@ -404,7 +405,7 @@ export default class YANavigator extends React.Component {
                 const {reactElement, events} =
                   replaceInstanceEventedProps(
                     Title,
-                    VALID_EVENTED_PROPS,
+                    eventedProps,
                     navigationDelegate._events,
                     route,
                     navigator.navigationContext
@@ -423,7 +424,7 @@ export default class YANavigator extends React.Component {
               } else if (typeof Title === 'function') {
                 const props = {};
 
-                Title.propTypes && VALID_EVENTED_PROPS.forEach((validProp) => {
+                Title.propTypes && eventedProps.forEach((validProp) => {
                   if (Title.propTypes[validProp]) {
                     const event = `onNavBarTitle${validProp.replace(/^on/, '')}`
 
@@ -541,6 +542,7 @@ export default class YANavigator extends React.Component {
     sceneStyle: PropTypes.object,
     eachSceneProps: PropTypes.object,
     shouldHandleAndroidBack: PropTypes.bool,
+    customEventedProps: PropTypes.arrayOf(PropTypes.string),
   };
 
   static defaultProps = {
@@ -552,6 +554,7 @@ export default class YANavigator extends React.Component {
     navBarBackBtn: {
       textStyle: {},
     },
+    customEventedProps: [],
   };
 
   static navBarHeight = Scene.navBarHeight;
