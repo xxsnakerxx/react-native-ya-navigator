@@ -142,6 +142,7 @@ export default class YANavigator extends React.Component {
     navBarBackBtn,
     navBarUnderlay,
     navBarFixedHeight,
+    navBarCrossPlatformUI,
   }) {
     const eventedProps = VALID_EVENTED_PROPS.concat(this.props.customEventedProps);
 
@@ -152,6 +153,7 @@ export default class YANavigator extends React.Component {
         backIcon={navBarBackBtn.icon}
         underlay={navBarUnderlay}
         fixedHeight={navBarFixedHeight}
+        crossPlatformUI={navBarCrossPlatformUI}
         routeMapper={{
           navBarBackgroundColor: (route) => {
             let navBarBackgroundColor = '';
@@ -499,6 +501,7 @@ export default class YANavigator extends React.Component {
       navBarUnderlay,
       useNavigationBar,
       navBarFixedHeight,
+      navBarCrossPlatformUI,
     } = this.props;
 
     const navigationDelegate = getNavigationDelegate(
@@ -523,6 +526,7 @@ export default class YANavigator extends React.Component {
           navBarBackBtn,
           navBarUnderlay,
           navBarFixedHeight,
+          navBarCrossPlatformUI,
         }) : null}
         sceneStyle={sceneStyle}
         onWillFocus={this._onWillFocus}
@@ -547,6 +551,7 @@ export default class YANavigator extends React.Component {
       icon: PropTypes.object,
       textStyle: PropTypes.object,
     }),
+    navBarCrossPlatformUI: PropTypes.bool,
     sceneStyle: PropTypes.object,
     eachSceneProps: PropTypes.object,
     shouldHandleAndroidBack: PropTypes.bool,
@@ -560,6 +565,7 @@ export default class YANavigator extends React.Component {
     useNavigationBar: true,
     shouldHandleAndroidBack: true,
     navBarFixedHeight: 0,
+    navBarCrossPlatformUI: false,
     navBarBackBtn: {
       textStyle: {},
     },

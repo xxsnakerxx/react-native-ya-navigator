@@ -31,6 +31,7 @@ export default class NavBar extends React.Component {
   static propTypes = {
     style: ViewPropTypes.style,
     isHiddenOnInit: PropTypes.bool,
+    fixedHeight: PropTypes.number,
     navState: Navigator.NavigationBar.propTypes.navState,
     routeMapper: PropTypes.shape({
       Title: PropTypes.func.isRequired,
@@ -40,6 +41,7 @@ export default class NavBar extends React.Component {
     }).isRequired,
     underlay: PropTypes.object,
     backIcon: PropTypes.object,
+    crossPlatformUI: PropTypes.bool,
   };
 
   constructor(props) {
@@ -224,6 +226,7 @@ export default class NavBar extends React.Component {
       navigator,
       backIcon,
       fixedHeight,
+      crossPlatformUI,
     } = this.props;
 
     const {
@@ -500,17 +503,17 @@ export default class NavBar extends React.Component {
 
     const prevTitlePart = prevTitle ?
       (<View
-        style={styles.titlePart}
+        style={(crossPlatformUI || IS_IOS) ? styles.titlePart_ios : styles.titlePart_android}
         pointerEvents={'box-none'}
       >
         <Animated.View
           style={[
             styles.animatedWrapper,
             {
-              paddingHorizontal: IS_IOS ?
+              paddingHorizontal: (crossPlatformUI || IS_IOS) ?
                 Math.max(prevLeftPartWidth, prevRightPartWidth) + paddingHorizontal:
                 0,
-              alignItems: IS_IOS ? 'center' : 'flex-start',
+              alignItems: (crossPlatformUI || IS_IOS) ? 'center' : 'flex-start',
               transform: [
                 {
                   translateX: IS_IOS ? animationProgress.interpolate({
@@ -569,17 +572,17 @@ export default class NavBar extends React.Component {
 
     const titlePart = title && animationFromIndex !== animationToIndex ?
       (<View
-        style={styles.titlePart}
+        style={(crossPlatformUI || IS_IOS) ? styles.titlePart_ios : styles.titlePart_android}
         pointerEvents={'box-none'}
       >
         <Animated.View
           style={[
             styles.animatedWrapper,
             {
-              paddingHorizontal: IS_IOS ?
+              paddingHorizontal: (crossPlatformUI || IS_IOS) ?
                 Math.max(leftPartWidth, rightPartWidth) + paddingHorizontal :
                 0,
-              alignItems: IS_IOS ? 'center' : 'flex-start',
+              alignItems: (crossPlatformUI || IS_IOS) ? 'center' : 'flex-start',
               transform: IS_IOS ? [
                 {
                   translateX: animationProgress.interpolate({
@@ -647,7 +650,7 @@ export default class NavBar extends React.Component {
           ]}
           pointerEvents={'box-none'}
         >
-          {IS_IOS && prevTitlePart}
+          {(crossPlatformUI || IS_IOS) && prevTitlePart}
           {prevLeftPart || prevBackBtn ?
             <View
               style={styles.leftPartContainer}
@@ -686,7 +689,7 @@ export default class NavBar extends React.Component {
             </View> :
             <View />
           }
-          {!IS_IOS && prevTitlePart}
+          {!(crossPlatformUI || IS_IOS) && prevTitlePart}
           {prevRightPart ?
             <View
               style={styles.rightPartContainer}
@@ -731,7 +734,7 @@ export default class NavBar extends React.Component {
           ]}
           pointerEvents={'box-none'}
         >
-          {IS_IOS && titlePart}
+          {(crossPlatformUI || IS_IOS) && titlePart}
           {(leftPart && animationFromIndex !== animationToIndex) || backBtn ?
             <View
               style={styles.leftPartContainer}
@@ -759,7 +762,7 @@ export default class NavBar extends React.Component {
             </View> :
             <View />
           }
-          {!IS_IOS && titlePart}
+          {!(crossPlatformUI || IS_IOS) && titlePart}
           {rightPart && animationFromIndex !== animationToIndex ?
             <View
               style={styles.rightPartContainer}
@@ -817,13 +820,14 @@ const styles = StyleSheet.create({
   leftPartContainer: {
     paddingLeft: PADDING_HORIZONTAL,
   },
-  titlePart: IS_IOS ? {
+  titlePart_ios: {
     position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-  } : {
+  },
+  titlePart_android: {
     flex: 1,
     paddingLeft: 10,
   },
