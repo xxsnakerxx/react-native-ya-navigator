@@ -136,12 +136,13 @@ export default class YANavigator extends React.Component {
             this.props.defaultSceneConfig;
   };
 
-  _renderNavigationBar(
+  _renderNavigationBar({
     navBarStyle,
     isHiddenOnInit,
     navBarBackBtn,
     navBarUnderlay,
-  ) {
+    navBarFixedHeight,
+  }) {
     const eventedProps = VALID_EVENTED_PROPS.concat(this.props.customEventedProps);
 
     return (
@@ -150,6 +151,7 @@ export default class YANavigator extends React.Component {
         style={navBarStyle}
         backIcon={navBarBackBtn.icon}
         underlay={navBarUnderlay}
+        fixedHeight={navBarFixedHeight}
         routeMapper={{
           navBarBackgroundColor: (route) => {
             let navBarBackgroundColor = '';
@@ -496,6 +498,7 @@ export default class YANavigator extends React.Component {
       navBarBackBtn,
       navBarUnderlay,
       useNavigationBar,
+      navBarFixedHeight,
     } = this.props;
 
     const navigationDelegate = getNavigationDelegate(
@@ -512,14 +515,15 @@ export default class YANavigator extends React.Component {
         renderScene={this._renderScene}
         configureScene={this._configureScene}
         defaultSceneConfig={defaultSceneConfig}
-        navigationBar={useNavigationBar ? this._renderNavigationBar(
+        navigationBar={useNavigationBar ? this._renderNavigationBar({
           navBarStyle,
-          navigationDelegate ?
+          isHiddenOnInit: navigationDelegate ?
             navigationDelegate.navBarIsHidden :
             false,
           navBarBackBtn,
           navBarUnderlay,
-        ) : null}
+          navBarFixedHeight,
+        }) : null}
         sceneStyle={sceneStyle}
         onWillFocus={this._onWillFocus}
         style={[
@@ -537,6 +541,7 @@ export default class YANavigator extends React.Component {
     useNavigationBar: PropTypes.bool,
     style: ViewPropTypes.style,
     navBarStyle: ViewPropTypes.style,
+    navBarFixedHeight: PropTypes.number,
     navBarUnderlay: PropTypes.object,
     navBarBackBtn: PropTypes.shape({
       icon: PropTypes.object,
@@ -554,6 +559,7 @@ export default class YANavigator extends React.Component {
       Navigator.SceneConfigs.PushFromRight,
     useNavigationBar: true,
     shouldHandleAndroidBack: true,
+    navBarFixedHeight: 0,
     navBarBackBtn: {
       textStyle: {},
     },

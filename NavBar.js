@@ -223,6 +223,7 @@ export default class NavBar extends React.Component {
       routeMapper,
       navigator,
       backIcon,
+      fixedHeight,
     } = this.props;
 
     const {
@@ -618,7 +619,7 @@ export default class NavBar extends React.Component {
           styles.navBar,
           navBarBackgroundColorStyle,
           {
-            height: navBarHeight,
+            height: !fixedHeight ? navBarHeight : fixedHeight,
             opacity: isGoingBack && prevRoute.component &&
                     getNavigationDelegate(prevRoute.component) &&
                     getNavigationDelegate(prevRoute.component).navBarIsHidden ?
@@ -641,6 +642,7 @@ export default class NavBar extends React.Component {
         <View // PREV LAYER
           style={[
             styles.layer,
+            fixedHeight ? { marginTop: 0 } : null,
             paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}
@@ -724,6 +726,7 @@ export default class NavBar extends React.Component {
         <View // LAYER
           style={[
             styles.layer,
+            fixedHeight ? { marginTop: 0 } : null,
             paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}

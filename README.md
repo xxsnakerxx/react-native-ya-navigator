@@ -69,6 +69,7 @@ class App extends React.Component {
   - `textStyle`
 - `eachSceneProps` (these props will be passed to each scene, for example, if you are using YANavigator inside tabs, you can to pass 'selected' prop to each scene, so each scene can decide should it updated via shouldComponentUpdate if it was hidden)
 - `customEventedProps` (you can pass here array of prop names that you need for link your custom components rendered in navigation bar)
+- `navBarFixedHeight` (use this to set custom fixed nav bar height)
 
 Also `YANavigator` class has static property `navBarHeight` (you can use it in your styles)
 
