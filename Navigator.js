@@ -31,9 +31,6 @@ export default class YANavigator extends React.Component {
     this.state = {
       shouldHandleAndroidBack: props.shouldHandleAndroidBack,
     }
-
-    // TODO: Remove this when https://github.com/mlabrum/react-native-custom-components/pull/1 will be merged
-    console.ignoredYellowBox = ['Warning: Navigator: isMounted'];
   }
 
   componentDidMount() {

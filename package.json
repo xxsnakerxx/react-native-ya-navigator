@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/xxsnakerxx/react-native-ya-navigator#readme",
   "dependencies": {
-    "react-native-deprecated-custom-components": "^0.1.0"
+    "react-native-deprecated-custom-components": "^0.1.1"
   }
 }
