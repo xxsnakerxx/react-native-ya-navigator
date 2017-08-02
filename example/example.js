@@ -1,4 +1,4 @@
-import YANavigator from './Navigator';
+import YANavigator from 'react-native-ya-navigator';
 
 import React from 'react';
 import PropTypes from 'prop-types';
