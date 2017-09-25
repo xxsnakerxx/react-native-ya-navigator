@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import { getNavigationDelegate, getOrientation } from './utils';
+import { getNavigationDelegate, getOrientation, isIphoneX } from './utils';
 import { Navigator } from 'react-native-deprecated-custom-components';
 
 import {
@@ -16,7 +16,14 @@ import {
 
 const IS_IOS = Platform.OS === 'ios';
 
-const NAV_BAR_STYLES = Navigator.NavigationBar.Styles;
+const NAV_BAR_STYLES = {
+  ...Navigator.NavigationBar.Styles,
+  General: {
+    ...Navigator.NavigationBar.Styles.General,
+    ...(isIphoneX() ? { StatusBarHeight: 44 } : {}),
+    ...(isIphoneX() ? { TotalNavHeight: Navigator.NavigationBar.Styles.General.NavBarHeight + 44 } : {}),
+  },
+};
 const NAV_BAR_DEFAULT_BACKGROUND_COLOR = 'white';
 const NAV_BAR_DEFAULT_TINT_COLOR = 'black';
 const NAV_HEIGHT = NAV_BAR_STYLES.General.TotalNavHeight;
@@ -645,8 +652,15 @@ export default class NavBar extends React.Component {
         <View // PREV LAYER
           style={[
             styles.layer,
+            {
+              marginTop: getOrientation() === 'PORTRAIT' ?
+                NAV_BAR_STYLES.General.StatusBarHeight :
+                0,
+              paddingHorizontal:
+                (getOrientation() === 'LANDSCAPE' && isIphoneX() ? 44 : 0) +
+                (paddingHorizontal || 0),
+            },
             fixedHeight ? { marginTop: 0 } : null,
-            paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}
         >
@@ -729,8 +743,15 @@ export default class NavBar extends React.Component {
         <View // LAYER
           style={[
             styles.layer,
+            {
+              marginTop: getOrientation() === 'PORTRAIT' ?
+                NAV_BAR_STYLES.General.StatusBarHeight :
+                0,
+              paddingHorizontal:
+                (getOrientation() === 'LANDSCAPE' && isIphoneX() ? 44 : 0) +
+                (paddingHorizontal || 0),
+            },
             fixedHeight ? { marginTop: 0 } : null,
-            paddingHorizontal ? { paddingHorizontal } : null,
           ]}
           pointerEvents={'box-none'}
         >
@@ -806,9 +827,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    marginTop: getOrientation() === 'PORTRAIT' ?
-      NAV_BAR_STYLES.General.StatusBarHeight :
-      0,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

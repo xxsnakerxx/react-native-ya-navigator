@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, ViewPropTypes } from 'react-native';
 import { Navigator } from 'react-native-deprecated-custom-components';
+import { isIphoneX } from './utils';
 
 export default class Scene extends React.Component {
   componentDidUpdate() {
@@ -35,11 +36,11 @@ export default class Scene extends React.Component {
 
         const navigationEvents = ['onSceneWillFocus', 'onSceneDidFocus'];
 
-        navigationEvents.forEach((eventName) =>
+        navigationEvents.forEach(eventName =>
           this._addListener(eventName, delegate));
 
-        if (delegate['onSceneWillFocus']) {
-          delegate['onSceneWillFocus']();
+        if (delegate.onSceneWillFocus) {
+          delegate.onSceneWillFocus();
         }
 
         setTimeout(() => {
@@ -62,15 +63,15 @@ export default class Scene extends React.Component {
           configurable: true,
           enumerable: false,
           value: () => {
-            delegateUnmountHandler && delegateUnmountHandler.bind(delegate)()
+            delegateUnmountHandler && delegateUnmountHandler.bind(delegate)();
 
-            navigationEvents.forEach((eventName) =>
-              this._removeListener(eventName, delegate))
+            navigationEvents.forEach(eventName =>
+              this._removeListener(eventName, delegate));
 
             const events = this._events;
 
             if (events && events.length) {
-              events.forEach((eventName) => this._removeListener(eventName));
+              events.forEach(eventName => this._removeListener(eventName));
             }
 
             this._events = null;
@@ -95,15 +96,15 @@ export default class Scene extends React.Component {
       }
 
       return eventName;
-    }
+    };
 
     this[`_${eventName}Sub`] = navigationContext.addListener(
       formatEventName(eventName),
-      ({data: {route, e}}) => {
+      ({ data: { route, e } }) => {
         if (delegateId === route.component.navigationDelegate.id && delegate[eventName]) {
           delegate[eventName](e);
         }
-      }
+      },
     );
   }
 
@@ -123,10 +124,11 @@ export default class Scene extends React.Component {
               0,
           },
           this.props.style,
-        ]}>
-          {this.props.children}
-        </View>
-    )
+        ]}
+      >
+        {this.props.children}
+      </View>
+    );
   }
 
   static propTypes = {
@@ -143,5 +145,6 @@ export default class Scene extends React.Component {
     paddingTop: true,
   };
 
-  static navBarHeight = Navigator.NavigationBar.Styles.General.TotalNavHeight;
+  static navBarHeight = Navigator.NavigationBar.Styles.General.TotalNavHeight +
+    (isIphoneX() ? 24 : 0);
 }
