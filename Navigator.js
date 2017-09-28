@@ -142,6 +142,7 @@ export default class YANavigator extends React.Component {
     navBarCrossPlatformUI,
   }) {
     const eventedProps = VALID_EVENTED_PROPS.concat(this.props.customEventedProps);
+    const { eachSceneProps } = this.props;
 
     return (
       <NavBar
@@ -177,7 +178,7 @@ export default class YANavigator extends React.Component {
 
               navigationDelegate._events = navigationDelegate._events || [];
 
-              LeftPart = navigationDelegate.renderNavBarLeftPart(route.props || {});
+              LeftPart = navigationDelegate.renderNavBarLeftPart({...route.props, ...eachSceneProps});
 
               if (!LeftPart) return null;
 
@@ -305,7 +306,7 @@ export default class YANavigator extends React.Component {
 
               navigationDelegate._events = navigationDelegate._events || [];
 
-              RightPart = navigationDelegate.renderNavBarRightPart(route.props || {});
+              RightPart = navigationDelegate.renderNavBarRightPart({...route.props, ...eachSceneProps});
 
               if (!RightPart) return null;
 
@@ -383,7 +384,7 @@ export default class YANavigator extends React.Component {
 
               navigationDelegate._events = navigationDelegate._events || [];
 
-              Title = navigationDelegate.renderTitle(route.props || {});
+              Title = navigationDelegate.renderTitle({...route.props, ...eachSceneProps});
 
               if (!Title) return null;
 
