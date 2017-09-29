@@ -112,10 +112,12 @@ export default class NavBar extends React.Component {
   }
 
   updateProgress(progress, fromIndex, toIndex) {
-    this.state = Object.assign({}, this.state, {
+    // eslint-disable-next-line react/no-direct-mutation-state
+    this.state = {
+      ...this.state,
       animationFromIndex: fromIndex,
       animationToIndex: toIndex,
-    });
+    };
 
     this.state.animationProgress.setValue(progress);
 
@@ -245,6 +247,8 @@ export default class NavBar extends React.Component {
       prevTitleXPos,
       prevTitleWidth,
       backIconWidth,
+      animationToIndex,
+      animationFromIndex,
     } = this.state;
 
     let {
@@ -253,16 +257,6 @@ export default class NavBar extends React.Component {
       prevRightPartWidth,
       rightPartWidth,
     } = this.state;
-
-    let {
-      animationToIndex,
-      animationFromIndex,
-    } = this.state;
-
-    if (animationToIndex === 0 && animationFromIndex === 0) {
-      animationToIndex = navState.presentedIndex;
-      animationFromIndex = navState.presentedIndex;
-    }
 
     let underlay = this.props.underlay;
 

@@ -87,7 +87,7 @@ export default class YANavigator extends React.Component {
     if (nextProps.shouldHandleAndroidBack !== this.props.shouldHandleAndroidBack) {
       this.setState({
         shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
-      })
+      });
     }
   }
 
@@ -135,16 +135,33 @@ export default class YANavigator extends React.Component {
             this.props.defaultSceneConfig;
   };
 
-  _renderNavigationBar({
-    navBarStyle,
-    isHiddenOnInit,
-    navBarBackBtn,
-    navBarUnderlay,
-    navBarFixedHeight,
-    navBarCrossPlatformUI,
-  }) {
-    const eventedProps = VALID_EVENTED_PROPS.concat(this.props.customEventedProps);
-    const { eachSceneProps } = this.props;
+  _renderNavigationBar = () => {
+    const {
+      initialRoute,
+      initialRouteStack,
+      navBarStyle,
+      navBarBackBtn,
+      navBarUnderlay,
+      useNavigationBar,
+      navBarFixedHeight,
+      navBarCrossPlatformUI,
+      customEventedProps,
+      eachSceneProps,
+    } = this.props;
+
+    if (!useNavigationBar) return null;
+
+    const eventedProps = VALID_EVENTED_PROPS.concat(customEventedProps);
+
+    const navigationDelegate = getNavigationDelegate(
+      (initialRoute && initialRoute.component) ||
+      (initialRouteStack && initialRouteStack.length &&
+        initialRouteStack[initialRouteStack.length - 1].component)
+    );
+
+    const isHiddenOnInit = navigationDelegate ?
+        navigationDelegate.navBarIsHidden :
+        false;
 
     return (
       <NavBar
@@ -494,21 +511,9 @@ export default class YANavigator extends React.Component {
       initialRoute,
       initialRouteStack,
       defaultSceneConfig,
-      navBarStyle,
       style,
       sceneStyle,
-      navBarBackBtn,
-      navBarUnderlay,
-      useNavigationBar,
-      navBarFixedHeight,
-      navBarCrossPlatformUI,
     } = this.props;
-
-    const navigationDelegate = getNavigationDelegate(
-      (initialRoute && initialRoute.component) ||
-      (initialRouteStack && initialRouteStack.length &&
-        initialRouteStack[initialRouteStack.length - 1].component)
-    );
 
     return (
       <Navigator
@@ -518,16 +523,7 @@ export default class YANavigator extends React.Component {
         renderScene={this._renderScene}
         configureScene={this._configureScene}
         defaultSceneConfig={defaultSceneConfig}
-        navigationBar={useNavigationBar ? this._renderNavigationBar({
-          navBarStyle,
-          isHiddenOnInit: navigationDelegate ?
-            navigationDelegate.navBarIsHidden :
-            false,
-          navBarBackBtn,
-          navBarUnderlay,
-          navBarFixedHeight,
-          navBarCrossPlatformUI,
-        }) : null}
+        navigationBar={this._renderNavigationBar()}
         sceneStyle={sceneStyle}
         onWillFocus={this._onWillFocus}
         style={[
