@@ -84,9 +84,11 @@ export default class YANavigator extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
-    })
+    if (nextProps.shouldHandleAndroidBack !== this.props.shouldHandleAndroidBack) {
+      this.setState({
+        shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
+      })
+    }
   }
 
   componentWillUnmount() {
