@@ -41,6 +41,7 @@ export default class YANavigator extends React.Component {
       'jumpTo',
       'push',
       'pop',
+      'popN',
       'replace',
       'replaceAtIndex',
       'replacePrevious',
