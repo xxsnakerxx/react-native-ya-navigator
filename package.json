@@ -1,6 +1,6 @@
 {
   "name": "react-native-ya-navigator",
-  "version": "0.8.12",
+  "version": "0.9.0",
   "description": "Yet another react native navigator component",
   "main": "Navigator.js",
   "scripts": {
