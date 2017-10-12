@@ -3,3 +3,5 @@ android/build
 ios/build
 *.iml
 images
+.eslintrc
+.eslintignore
