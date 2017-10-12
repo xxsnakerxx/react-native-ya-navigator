@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import NavBar from './NavBar';
 import Scene from './Scene';
 import { getNavigationDelegate, replaceInstanceEventedProps } from './utils';
-import { Navigator } from 'react-native-deprecated-custom-components';
+import FBNavigator from './FBNavigator';
 
 import {
   StyleSheet,
@@ -517,7 +517,7 @@ export default class YANavigator extends React.Component {
     } = this.props;
 
     return (
-      <Navigator
+      <FBNavigator
         ref={'navigator'}
         initialRoute={initialRoute}
         initialRouteStack={initialRouteStack}
@@ -536,8 +536,8 @@ export default class YANavigator extends React.Component {
   }
 
   static propTypes = {
-    initialRoute: Navigator.propTypes.initialRoute,
-    initialRouteStack: Navigator.propTypes.initialRouteStack,
+    initialRoute: FBNavigator.propTypes.initialRoute,
+    initialRouteStack: FBNavigator.propTypes.initialRouteStack,
     defaultSceneConfig: PropTypes.object,
     useNavigationBar: PropTypes.bool,
     style: ViewPropTypes.style,
@@ -557,8 +557,8 @@ export default class YANavigator extends React.Component {
 
   static defaultProps = {
     defaultSceneConfig: Platform.OS === 'android' ?
-      Navigator.SceneConfigs.FadeAndroid :
-      Navigator.SceneConfigs.PushFromRight,
+      FBNavigator.SceneConfigs.FadeAndroid :
+      FBNavigator.SceneConfigs.PushFromRight,
     useNavigationBar: true,
     shouldHandleAndroidBack: true,
     navBarFixedHeight: 0,
@@ -580,3 +580,4 @@ const styles = StyleSheet.create({
 })
 
 YANavigator.Scene = Scene;
+YANavigator.FBNavigator = FBNavigator;

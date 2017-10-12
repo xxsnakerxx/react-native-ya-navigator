@@ -21,7 +21,12 @@
   },
   "homepage": "https://github.com/xxsnakerxx/react-native-ya-navigator#readme",
   "dependencies": {
-    "react-native-deprecated-custom-components": "^0.1.1"
+    "fbjs": "~0.8.9",
+    "immutable": "~3.7.6",
+    "create-react-class": "15.6.0",
+    "prop-types": "^15.5.10",
+    "react-timer-mixin": "^0.13.2",
+    "rebound": "0.0.15"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.1",

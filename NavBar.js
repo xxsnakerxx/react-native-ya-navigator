@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { getNavigationDelegate, getOrientation, isIphoneX } from './utils';
-import { Navigator } from 'react-native-deprecated-custom-components';
+import FBNavigator from './FBNavigator';
 
 import {
   View,
@@ -17,11 +17,11 @@ import {
 const IS_IOS = Platform.OS === 'ios';
 
 const NAV_BAR_STYLES = {
-  ...Navigator.NavigationBar.Styles,
+  ...FBNavigator.NavigationBar.Styles,
   General: {
-    ...Navigator.NavigationBar.Styles.General,
+    ...FBNavigator.NavigationBar.Styles.General,
     ...(isIphoneX() ? { StatusBarHeight: 44 } : {}),
-    ...(isIphoneX() ? { TotalNavHeight: Navigator.NavigationBar.Styles.General.NavBarHeight + 44 } : {}),
+    ...(isIphoneX() ? { TotalNavHeight: FBNavigator.NavigationBar.Styles.General.NavBarHeight + 44 } : {}),
   },
 };
 const NAV_BAR_DEFAULT_BACKGROUND_COLOR = 'white';
@@ -39,7 +39,7 @@ export default class NavBar extends React.Component {
     style: ViewPropTypes.style,
     isHiddenOnInit: PropTypes.bool,
     fixedHeight: PropTypes.number,
-    navState: Navigator.NavigationBar.propTypes.navState,
+    navState: FBNavigator.NavigationBar.propTypes.navState,
     routeMapper: PropTypes.shape({
       Title: PropTypes.func.isRequired,
       LeftPart: PropTypes.func.isRequired,
@@ -112,16 +112,12 @@ export default class NavBar extends React.Component {
   }
 
   updateProgress(progress, fromIndex, toIndex) {
-    // eslint-disable-next-line react/no-direct-mutation-state
-    this.state = {
-      ...this.state,
+    this.setState({
       animationFromIndex: fromIndex,
       animationToIndex: toIndex,
-    };
+    });
 
     this.state.animationProgress.setValue(progress);
-
-    this.forceUpdate();
   }
 
   immediatelyRefresh() {

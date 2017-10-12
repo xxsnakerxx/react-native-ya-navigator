@@ -16,7 +16,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { Navigator } from 'react-native-deprecated-custom-components';
+const { FBNavigator } = YANavigator;
 
 export default class YANavigatorExample extends React.Component {
   render() {
@@ -203,7 +203,7 @@ class View2 extends React.Component {
   onNavBarTitlePress() {
     if (!this.state.fetching) {
       this.setState({
-        titlePressCount: ++this.state.titlePressCount,
+        titlePressCount: this.state.titlePressCount + 1,
       }, () => {
         this.props.navigator._navBar.refs.view2_title.setState({
           text: `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}`,
@@ -326,7 +326,7 @@ class View3 extends React.Component {
     id: 'view3',
     navBarIsHidden: true,
     backBtnText: 'Back!',
-    sceneConfig: Platform.OS === 'ios' && Navigator.SceneConfigs.FloatFromBottom,
+    sceneConfig: Platform.OS === 'ios' && FBNavigator.SceneConfigs.FloatFromBottom,
   }
 }
 

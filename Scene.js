@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View, ViewPropTypes } from 'react-native';
-import { Navigator } from 'react-native-deprecated-custom-components';
+import FBNavigator from './FBNavigator';
 import { isIphoneX } from './utils';
 
 export default class Scene extends React.Component {
@@ -36,7 +36,7 @@ export default class Scene extends React.Component {
 
         const navigationEvents = ['onSceneWillFocus', 'onSceneDidFocus'];
 
-        navigationEvents.forEach(eventName =>
+        navigationEvents.forEach((eventName) =>
           this._addListener(eventName, delegate));
 
         if (delegate.onSceneWillFocus) {
@@ -65,13 +65,13 @@ export default class Scene extends React.Component {
           value: () => {
             delegateUnmountHandler && delegateUnmountHandler.bind(delegate)();
 
-            navigationEvents.forEach(eventName =>
+            navigationEvents.forEach((eventName) =>
               this._removeListener(eventName, delegate));
 
             const events = this._events;
 
             if (events && events.length) {
-              events.forEach(eventName => this._removeListener(eventName));
+              events.forEach((eventName) => this._removeListener(eventName));
             }
 
             this._events = null;
@@ -145,6 +145,6 @@ export default class Scene extends React.Component {
     paddingTop: true,
   };
 
-  static navBarHeight = Navigator.NavigationBar.Styles.General.TotalNavHeight +
+  static navBarHeight = FBNavigator.NavigationBar.Styles.General.TotalNavHeight +
     (isIphoneX() ? 24 : 0);
 }
