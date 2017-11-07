@@ -90,6 +90,10 @@ export default class YANavigator extends React.Component {
         shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
       });
     }
+
+    if (nextProps.initialRoute.component !== this.props.initialRoute.component) {
+      this.refs.navigator.resetTo(nextProps.initialRoute);
+    }
   }
 
   componentWillUnmount() {
