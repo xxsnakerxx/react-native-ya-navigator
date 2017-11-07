@@ -101,7 +101,9 @@ export default class Scene extends React.Component {
     this[`_${eventName}Sub`] = navigationContext.addListener(
       formatEventName(eventName),
       ({ data: { route, e } }) => {
-        if (delegateId === route.component.navigationDelegate.id && delegate[eventName]) {
+        if (route.component.navigationDelegate &&
+            delegateId === route.component.navigationDelegate.id &&
+            delegate[eventName]) {
           delegate[eventName](e);
         }
       },
