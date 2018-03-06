@@ -205,7 +205,7 @@ class View2 extends React.Component {
       this.setState({
         titlePressCount: this.state.titlePressCount + 1,
       }, () => {
-        this.props.navigator._navBar.refs.view2_title.setState({
+        this.props.navigator.navBarParts.view2_title.setState({
           text: `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}`,
         })
       })
@@ -242,30 +242,34 @@ class View2 extends React.Component {
             this.setState({
               fetching: !this.state.fetching,
             }, () => {
-              this.props.navigator._navBar.refs.view2_rightPart
-              .setState({
-                fetching: this.state.fetching,
-              })
+              this.props.navigator.navBarParts.view2_rightPart
+                .setState({
+                  fetching: this.state.fetching,
+                });
 
-              this.props.navigator._navBar.refs.view2_title
-              .setState({
-                text: this.state.fetching ?
-                  'Fetching...' :
-                  this.state.titlePressCount ? `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}` : 'Press me!',
-              })
-            })
+              this.props.navigator.navBarParts.view2_title
+                .setState({
+                  text: this.state.fetching ?
+                    'Fetching...' :
+                    this.state.titlePressCount ?
+                      `Pressed ${this.state.titlePressCount} time${this.state.titlePressCount > 1 ? 's' : ''}` :
+                      'Press me!',
+                });
+            });
         }}>
           {`${this.state.fetching ? 'Stop' : 'Start'} fake fetching something`}
         </Text>
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.updateUI({
-              title: <View2NavBarTitle
-                text={this.props.navigator._navBar.refs.view2_title.state.text}
+            View2.navigationDelegate.renderTitle = () => (
+              <View2NavBarTitle
+                text={this.props.navigator.navBarParts.view2_title.state.text}
                 onPress={() => 'onNavBarTitlePress'}
-                />,
-            });
+              />
+            );
+
+            this.props.navigator.forceUpdateNavBar();
 
             this.props.navigator.push({
               component: View3,
@@ -331,15 +335,15 @@ class View3 extends React.Component {
 }
 
 class View4NavBarLogo extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       angle: new Animated.Value(0),
     }
   }
 
-  animate() {
+  animate = () => {
     Animated.timing(this.state.angle, {
       toValue: this.state.angle.__getValue() ? 0 : 720,
       duration: 2000,
@@ -388,35 +392,35 @@ class View4 extends React.Component {
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.refs.view4_title.animate();
+            this.props.navigator.navBarParts.view4_title.animate();
           }}>
           {'Animate logo'}
         </Text>
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.hide();
+            this.props.navigator.hideNavBar();
           }}>
           {'Hide nav bar'}
         </Text>
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.show();
+            this.props.navigator.showNavBar();
           }}>
           {'Show nav bar'}
         </Text>
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.hide('slide');
+            this.props.navigator.hideNavBar('slide');
           }}>
           {'Hide nav bar - slide'}
         </Text>
         <Text
           style={styles.text}
           onPress={() => {
-            this.props.navigator._navBar.show('slide');
+            this.props.navigator.showNavBar('slide');
           }}>
           {'Show nav bar - slide'}
         </Text>
