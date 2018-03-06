@@ -5,26 +5,7 @@ import FBNavigator from './FBNavigator';
 import { isIphoneX } from './utils';
 
 export default class Scene extends React.Component {
-  componentDidUpdate() {
-    const { delegate } = this.props;
-
-    if (delegate) {
-      const navigationDelegate = delegate.constructor.navigationDelegate;
-      const events = navigationDelegate._events;
-
-      setTimeout(() => {
-        if (events && events.length) {
-          events.forEach((eventName) => {
-            if (!this[`_${eventName}Sub`]) {
-              this._addListener(eventName, delegate);
-            }
-          });
-        }
-      }, 300);
-    }
-  }
-
-  componentWillMount() {
+  componentDidMount() {
     const { delegate } = this.props;
 
     if (delegate) {
@@ -81,6 +62,25 @@ export default class Scene extends React.Component {
           },
         });
       }
+    }
+  }
+
+  componentDidUpdate() {
+    const { delegate } = this.props;
+
+    if (delegate) {
+      const navigationDelegate = delegate.constructor.navigationDelegate;
+      const events = navigationDelegate._events;
+
+      setTimeout(() => {
+        if (events && events.length) {
+          events.forEach((eventName) => {
+            if (!this[`_${eventName}Sub`]) {
+              this._addListener(eventName, delegate);
+            }
+          });
+        }
+      }, 300);
     }
   }
 

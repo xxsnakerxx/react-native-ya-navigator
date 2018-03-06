@@ -25,12 +25,20 @@ const VALID_EVENTED_PROPS = [
 ];
 
 export default class YANavigator extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    return {
+      shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
+    };
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
       shouldHandleAndroidBack: props.shouldHandleAndroidBack,
     }
+
+    this.navBarParts = {};
   }
 
   componentDidMount() {
@@ -53,10 +61,15 @@ export default class YANavigator extends React.Component {
     ];
 
     navigatorMethods.forEach((method) => {
-      this[method] = this.refs.navigator[method];
+      this[method] = this.fbNavigator[method];
     })
 
-    this.refs.navigator.setShouldHandleAndroidBack = this.setShouldHandleAndroidBack.bind(this);
+    this.fbNavigator.setShouldHandleAndroidBack = this.setShouldHandleAndroidBack.bind(this);
+    this.fbNavigator.forceUpdateNavBar = this.forceUpdateNavBar.bind(this);
+    this.fbNavigator.showNavBar = this.showNavBar.bind(this);
+    this.fbNavigator.hideNavBar = this.hideNavBar.bind(this);
+
+    this.fbNavigator.navBarParts = this.navBarParts;
 
     if (Platform.OS === 'android') {
       this._backPressSub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -84,15 +97,9 @@ export default class YANavigator extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.shouldHandleAndroidBack !== this.props.shouldHandleAndroidBack) {
-      this.setState({
-        shouldHandleAndroidBack: nextProps.shouldHandleAndroidBack,
-      });
-    }
-
-    if (nextProps.initialRoute.component !== this.props.initialRoute.component) {
-      this.refs.navigator.resetTo(nextProps.initialRoute);
+  componentDidUpdate(prevProps) {
+    if (this.props.initialRoute.component !== prevProps.initialRoute.component) {
+      this.resetTo(this.props.initialRoute);
     }
   }
 
@@ -101,12 +108,26 @@ export default class YANavigator extends React.Component {
       this._backPressSub.remove();
       this._backPressSub = null;
     }
+
+    this.fbNavigator.navBarParts = null;
   }
 
   setShouldHandleAndroidBack(should) {
     this.setState({
       shouldHandleAndroidBack: should,
     });
+  }
+
+  forceUpdateNavBar() {
+    this.fbNavigator._navBar.forceUpdate();
+  }
+
+  showNavBar(args) {
+    this.fbNavigator._navBar.show(args);
+  }
+
+  hideNavBar(args) {
+    this.fbNavigator._navBar.hide(args);
   }
 
   _renderScene = (route, navigator) => {
@@ -206,6 +227,9 @@ export default class YANavigator extends React.Component {
 
               if (!LeftPart) return null;
 
+              const ref = (ref) => this.navBarParts[`${navigationDelegate.id ||
+                `${navigator.state.presentedIndex + 1}_scene`}_rightPart`] = ref;
+
               if (typeof LeftPart === 'object' && React.isValidElement(LeftPart)) {
                 const children =
                   React.Children.toArray(LeftPart.props.children).map((child) => {
@@ -240,9 +264,6 @@ export default class YANavigator extends React.Component {
 
                 LeftPart = reactElement;
 
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_leftPart`;
-
                 LeftPart = React.cloneElement(LeftPart, {ref}, children)
               } else if (typeof LeftPart === 'function') {
                 const props = {};
@@ -258,10 +279,7 @@ export default class YANavigator extends React.Component {
                     props[validProp] = (e) => navigator.navigationContext
                       .emit(event, {route, e});
                   }
-                })
-
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_leftPart`;
+                });
 
                 LeftPart = <LeftPart ref={ref} {...props} />
               }
@@ -334,6 +352,9 @@ export default class YANavigator extends React.Component {
 
               if (!RightPart) return null;
 
+              const ref = (ref) => this.navBarParts[`${navigationDelegate.id ||
+                `${navigator.state.presentedIndex + 1}_scene`}_rightPart`] = ref;
+
               if (typeof RightPart === 'object' && React.isValidElement(RightPart)) {
                 const children =
                   React.Children.toArray(RightPart.props.children).map((child) => {
@@ -368,9 +389,6 @@ export default class YANavigator extends React.Component {
 
                 RightPart = reactElement;
 
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_rightPart`;
-
                 RightPart = React.cloneElement(RightPart, {ref}, children)
               } else if (typeof RightPart === 'function') {
                 const props = {};
@@ -386,10 +404,7 @@ export default class YANavigator extends React.Component {
                     props[validProp] = (e) => navigator.navigationContext
                       .emit(event, {route, e});
                   }
-                })
-
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_rightPart`;
+                });
 
                 RightPart = <RightPart ref={ref} {...props} />
               }
@@ -411,6 +426,9 @@ export default class YANavigator extends React.Component {
               Title = navigationDelegate.renderTitle({...route.props, ...eachSceneProps});
 
               if (!Title) return null;
+
+              const ref = (ref) => this.navBarParts[`${navigationDelegate.id ||
+                `${navigator.state.presentedIndex + 1}_scene`}_title`] = ref;
 
               if (typeof Title === 'object' && React.isValidElement(Title)) {
                 const children =
@@ -446,9 +464,6 @@ export default class YANavigator extends React.Component {
 
                 Title = reactElement;
 
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_title`;
-
                 Title = React.cloneElement(Title, {ref}, children)
               } else if (typeof Title === 'function') {
                 const props = {};
@@ -464,10 +479,7 @@ export default class YANavigator extends React.Component {
                     props[validProp] = (e) => navigator.navigationContext
                       .emit(event, {route, e});
                   }
-                })
-
-                const ref = `${navigationDelegate.id ||
-                  `${navigator.state.presentedIndex + 1}_scene`}_title`;
+                });
 
                 Title = <Title ref={ref} {...props} />
               }
@@ -509,7 +521,9 @@ export default class YANavigator extends React.Component {
         navBar.hide() :
         navBar.show();
     }
-  };
+  }
+
+  _setFBNavigatorRef = (ref) => this.fbNavigator = ref;
 
   render() {
     const {
@@ -522,7 +536,7 @@ export default class YANavigator extends React.Component {
 
     return (
       <FBNavigator
-        ref={'navigator'}
+        ref={this._setFBNavigatorRef}
         initialRoute={initialRoute}
         initialRouteStack={initialRouteStack}
         renderScene={this._renderScene}

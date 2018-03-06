@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import { getNavigationDelegate, getOrientation, isIphoneX } from './utils';
+import { getNavigationOption, getOrientation, isIphoneX } from './utils';
 import FBNavigator from './FBNavigator';
 
 import {
@@ -34,6 +34,8 @@ const DEFAULT_IOS_BACK_ICON = 'ios-arrow-back';
 const DEFAULT_ANDROID_BACK_ICON = 'md-arrow-back';
 const PADDING_HORIZONTAL = 10;
 
+const BACK_ICON_NAME = IS_IOS ? DEFAULT_IOS_BACK_ICON : DEFAULT_ANDROID_BACK_ICON;
+
 export default class NavBar extends React.Component {
   static propTypes = {
     style: ViewPropTypes.style,
@@ -63,52 +65,14 @@ export default class NavBar extends React.Component {
       navBarWidth: SCREEN_WIDTH,
       navBarHeight: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
         (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
-      prevLeftPartWidth: null,
+      prevLeftPartWidth: 0,
       leftPartWidth: 0,
-      prevRightPartWidth: null,
+      prevRightPartWidth: 0,
       rightPartWidth: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
       backIconWidth: 0,
     };
-  }
-
-  _setTitle(title) {
-    const currentRoute = this.props.navState.routeStack.slice(-1)[0];
-    const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
-
-    if (navigationDelegate) {
-      navigationDelegate.renderTitle = (routeProps) => title; // eslint-disable-line no-unused-vars
-    }
-  }
-
-  _setLeftPart(part) {
-    const currentRoute = this.props.navState.routeStack.slice(-1)[0];
-    const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
-
-    if (navigationDelegate) {
-      navigationDelegate.renderNavBarLeftPart = (routeProps) => part; // eslint-disable-line no-unused-vars
-    }
-  }
-
-  _setRightPart(part) {
-    const currentRoute = this.props.navState.routeStack.slice(-1)[0];
-    const navigationDelegate = getNavigationDelegate(currentRoute.component);
-    const routeProps = currentRoute.props || {}; // eslint-disable-line no-unused-vars
-
-    if (navigationDelegate) {
-      navigationDelegate.renderNavBarRightPart = (routeProps) => part; // eslint-disable-line no-unused-vars
-    }
-  }
-
-  updateUI(ui) {
-    ui.title !== undefined && this._setTitle(ui.title);
-    ui.leftPart !== undefined && this._setLeftPart(ui.leftPart);
-    ui.rightPart !== undefined && this._setRightPart(ui.rightPart);
-
-    this.forceUpdate();
   }
 
   updateProgress(progress, fromIndex, toIndex) {
@@ -127,9 +91,9 @@ export default class NavBar extends React.Component {
       animationToIndex: 0,
       navBarOpacity: new Animated.Value(this.props.isHiddenOnInit ? 0 : 1),
       navBarYPos: new Animated.Value(this.props.isHiddenOnInit ? -NAV_HEIGHT : 0),
-      prevLeftPartWidth: null,
+      prevLeftPartWidth: 0,
       leftPartWidth: 0,
-      prevRightPartWidth: null,
+      prevRightPartWidth: 0,
       rightPartWidth: 0,
       prevTitleXPos: 0,
       prevTitleWidth: 0,
@@ -242,15 +206,15 @@ export default class NavBar extends React.Component {
       navBarHeight,
       prevTitleXPos,
       prevTitleWidth,
+      prevLeftPartWidth,
+      prevRightPartWidth,
       backIconWidth,
       animationToIndex,
       animationFromIndex,
     } = this.state;
 
     let {
-      prevLeftPartWidth,
       leftPartWidth,
-      prevRightPartWidth,
       rightPartWidth,
     } = this.state;
 
@@ -308,308 +272,12 @@ export default class NavBar extends React.Component {
     const prevRoute =
       navState.routeStack[isGoingBack ? animationToIndex : animationFromIndex];
 
-    const title =
-      route && routeMapper.Title((route || prevRoute), navigator) || null;
-    const prevTitle =
-      prevRoute && routeMapper.Title((prevRoute || route), navigator) || null;
+    const routeNavBarIsHidden = getNavigationOption(route, 'navBarIsHidden');
+    const prevRouteNavBarIsHidden = getNavigationOption(prevRoute, 'navBarIsHidden');
 
-    let prevLeftPart =
-      prevRoute && routeMapper.LeftPart(
-        prevRoute || route,
-        navigator,
-        isGoingBack ? animationToIndex  : animationFromIndex,
-        navState
-      ) || null;
-
-    let leftPart =
-      route && routeMapper.LeftPart(
-        route || prevRoute,
-        navigator,
-        isGoingBack ? animationFromIndex : animationToIndex,
-        navState
-      ) || null;
-
-    prevLeftPartWidth = prevLeftPart ? prevLeftPartWidth : 0;
-    leftPartWidth = leftPart ? leftPartWidth : 0;
-
-    let backBtn;
-    let prevBackBtn;
-
-    const backIconName = IS_IOS ?
-      DEFAULT_IOS_BACK_ICON :
-      DEFAULT_ANDROID_BACK_ICON;
-
-    const backIconSize = IS_IOS ?
-      (getOrientation() === 'PORTRAIT' ? 32 : 26) :
-      24;
-
-    if (prevLeftPart && prevLeftPart.isBackBtn) {
-      prevBackBtn = (
-        <Animated.View
-          style={[
-            styles.animatedWrapper,
-            {
-              transform: [
-                {
-                  translateX: animationProgress.interpolate({
-                    inputRange: [0, 0.999, 1],
-                    outputRange: isGoingBack ? [0, 0, 0] : [0, -SCREEN_WIDTH, -SCREEN_WIDTH],
-                  }),
-                },
-              ],
-              opacity: animationProgress.interpolate({
-                inputRange: [0, 0.8, 1],
-                outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
-              }),
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={prevLeftPart.onPress}
-            hitSlop={{
-              left: 10,
-              top: 0,
-              right: 10,
-              bottom: 0,
-            }}
-          >
-            {backIcon ||
-              <Ionicon
-                style={styles.backBtnIcon}
-                onLayout={this._onBackIconLayout}
-                name={backIconName}
-                size={backIconSize}
-                color={
-                  prevLeftPart.textStyle.color ||
-                  NAV_BAR_DEFAULT_TINT_COLOR}
-              />
-            }
-            {IS_IOS &&
-              <Animated.Text
-                numberOfLines={1}
-                allowFontScaling={false}
-                style={[
-                  styles.backBtnText,
-                  prevLeftPart.textStyle,
-                  {
-                    transform: [
-                      {
-                        translateX: animationProgress.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: isGoingBack ? [-leftPartWidth, 0] : [0, -leftPartWidth],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                {prevLeftPart.text}
-              </Animated.Text>
-            }
-          </TouchableOpacity>
-        </Animated.View>
-      );
-
-      prevLeftPart = null;
-    }
-
-    if (leftPart && leftPart.isBackBtn) {
-      backBtn = (
-        <Animated.View
-          style={[
-            styles.animatedWrapper,
-            {
-              opacity: animationProgress.interpolate({
-                inputRange: [0, 0.8, 1],
-                outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
-              }),
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={leftPart.onPress}
-            hitSlop={{
-              left: 10,
-              top: 0,
-              right: 10,
-              bottom: 0,
-            }}
-          >
-            {backIcon ||
-              <Ionicon
-                style={styles.backBtnIcon}
-                onLayout={this._onBackIconLayout}
-                name={backIconName}
-                size={backIconSize}
-                color={
-                  leftPart.textStyle.color ||
-                  NAV_BAR_DEFAULT_TINT_COLOR}
-              />
-            }
-            {IS_IOS &&
-              <Animated.Text
-                numberOfLines={1}
-                allowFontScaling={false}
-                style={[
-                  styles.backBtnText,
-                  leftPart.textStyle,
-                  {
-                    transform: [
-                      {
-                        translateX: animationProgress.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: isGoingBack ?
-                          [
-                            0,
-                            prevTitleXPos -
-                            (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
-                          ] :
-                          [
-                            prevTitleXPos -
-                            (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
-                            0,
-                          ],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                {leftPart.text}
-              </Animated.Text>
-            }
-          </TouchableOpacity>
-        </Animated.View>
-      );
-
-      leftPart = null;
-    }
-
-    const prevRightPart =
-      prevRoute && routeMapper.RightPart((prevRoute || route), navigator) || null;
-    const rightPart =
-      route && routeMapper.RightPart((route || prevRoute), navigator) || null;
-
-    prevRightPartWidth = prevRightPart ? prevRightPartWidth : 0;
-    rightPartWidth = rightPart ? rightPartWidth : 0;
-
-    const prevTitlePartWidth =
-      navBarWidth - (prevLeftPartWidth + prevRightPartWidth + paddingHorizontal);
-
-    const prevTitlePart = prevTitle ?
-      (<View
-        style={(crossPlatformUI || IS_IOS) ? styles.titlePart_ios : styles.titlePart_android}
-        pointerEvents={'box-none'}
-      >
-        <Animated.View
-          style={[
-            styles.animatedWrapper,
-            {
-              paddingHorizontal: (crossPlatformUI || IS_IOS) ?
-                Math.max(prevLeftPartWidth, prevRightPartWidth) + paddingHorizontal:
-                0,
-              alignItems: (crossPlatformUI || IS_IOS) ? 'center' : 'flex-start',
-              transform: [
-                {
-                  translateX: IS_IOS ? animationProgress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange:
-                      isGoingBack ?
-                      [
-                        prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -(prevTitleXPos -
-                          (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
-                           : 0,
-                        0,
-                      ] :
-                      [
-                        0,
-                        prevTitlePartWidth - prevTitleWidth > 0 ?
-                          -(prevTitleXPos -
-                          (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
-                           : 0,
-                      ],
-                  }) : 0,
-                },
-                {
-                  translateY: animationProgress.interpolate({
-                    inputRange: [0, 0.999, 1],
-                    outputRange:
-                      isGoingBack ?
-                        [0, 0, 0] :
-                        [0, 0, -SCREEN_WIDTH],
-                  }),
-                },
-              ],
-              opacity: animationProgress.interpolate({
-                inputRange: [0, 1],
-                outputRange: isGoingBack ? [0, 1] : [1, 0],
-              }),
-            },
-          ]}
-        >
-          {/* for measuring prev title */}
-          <View
-            onLayout={IS_IOS ? this._onPrevTitleLayout : null}
-            pointerEvents={'none'}
-            style={{
-              opacity: 0,
-              position: 'absolute',
-            }}
-          >
-            {prevTitle}
-          </View>
-
-          {prevTitle}
-        </Animated.View>
-      </View>) :
-      null;
-
-    const titlePart = title && animationFromIndex !== animationToIndex ?
-      (<View
-        style={(crossPlatformUI || IS_IOS) ? styles.titlePart_ios : styles.titlePart_android}
-        pointerEvents={'box-none'}
-      >
-        <Animated.View
-          style={[
-            styles.animatedWrapper,
-            {
-              paddingHorizontal: (crossPlatformUI || IS_IOS) ?
-                Math.max(leftPartWidth, rightPartWidth) + paddingHorizontal :
-                0,
-              alignItems: (crossPlatformUI || IS_IOS) ? 'center' : 'flex-start',
-              transform: IS_IOS ? [
-                {
-                  translateX: animationProgress.interpolate({
-                    inputRange: [0, 0.999, 1],
-                    outputRange:
-                      isGoingBack ?
-                      [
-                        0,
-                        (navBarWidth / 2) + (navBarWidth * 0.2),
-                        -SCREEN_WIDTH,
-                      ] :
-                      [
-                        (navBarWidth / 2) + (navBarWidth * 0.2),
-                        0,
-                        0,
-                      ],
-                  }),
-                },
-              ] : [],
-              opacity: animationProgress.interpolate({
-                inputRange: [0, 0.66, 1],
-                outputRange: isGoingBack ? [1, 0, 0] : [0, 0.2, 1],
-              }),
-            },
-          ]}
-        >
-          {title}
-        </Animated.View>
-      </View>) :
-      null;
+    const shouldAnimateNavBarParts = IS_IOS &&
+      !((!isGoingBack && routeNavBarIsHidden || isGoingBack && prevRouteNavBarIsHidden) ||
+      (isGoingBack && routeNavBarIsHidden || !isGoingBack && prevRouteNavBarIsHidden));
 
     return (
       <Animated.View
@@ -620,14 +288,19 @@ export default class NavBar extends React.Component {
           navBarBackgroundColorStyle,
           {
             height: !fixedHeight ? navBarHeight : fixedHeight,
-            opacity: isGoingBack && prevRoute.component &&
-                    getNavigationDelegate(prevRoute.component) &&
-                    getNavigationDelegate(prevRoute.component).navBarIsHidden ?
-              animationProgress.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [1, 0, 0],
-              }) :
-              navBarOpacity,
+            opacity: (!isGoingBack && routeNavBarIsHidden ||
+                isGoingBack && prevRouteNavBarIsHidden) ?
+                  animationProgress.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [1, 0, 0],
+                  }) :
+                (isGoingBack && routeNavBarIsHidden ||
+                !isGoingBack && prevRouteNavBarIsHidden) ?
+                  animationProgress.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0, 0, 1],
+                  }) :
+                navBarOpacity,
             transform: [
               {
                 translateY: navBarYPos,
@@ -639,77 +312,199 @@ export default class NavBar extends React.Component {
 
         {navBarBackgroundColor !== 'transparent' ? underlay : null}
 
-        <View // PREV LAYER
-          style={[
-            styles.layer,
-            {
-              marginTop: getOrientation() === 'PORTRAIT' ?
-                NAV_BAR_STYLES.General.StatusBarHeight :
-                0,
-              paddingHorizontal:
-                (getOrientation() === 'LANDSCAPE' && isIphoneX() ? 44 : 0) +
-                (paddingHorizontal || 0),
-            },
-            fixedHeight ? { marginTop: 0 } : null,
-          ]}
-          pointerEvents={'box-none'}
-        >
-          {(crossPlatformUI || IS_IOS) && prevTitlePart}
-          {prevLeftPart || prevBackBtn ?
-            <View
-              style={styles.leftPartContainer}
-              pointerEvents={'box-none'}
-              onLayout={IS_IOS ? this._onPrevLeftPartLayout : null}
-            >
-              {prevLeftPart ?
-                <Animated.View
-                  style={[
-                    styles.animatedWrapper,
+        {navState.routeStack.map((route, index) => {
+          const isCurrentRoute = (isGoingBack ? animationFromIndex : animationToIndex) === index ||
+            animationFromIndex === animationToIndex;
+          const isPrevRoute = (isGoingBack ? animationToIndex : animationFromIndex) === index;
+
+          let leftPart =
+            route && routeMapper.LeftPart(
+              route,
+              navigator,
+              index,
+              navState,
+            ) || null;
+
+          const BACK_ICON_SIZE = IS_IOS ?
+            (getOrientation() === 'PORTRAIT' ? 32 : 26) :
+            24;
+
+          let backBtn = null;
+
+          if (leftPart && leftPart.isBackBtn) {
+            backBtn = <Animated.View
+              style={[
+                styles.animatedWrapper,
+                isCurrentRoute ? {
+                  opacity: animationProgress.interpolate({
+                    inputRange: [0, 0.8, 1],
+                    outputRange: isGoingBack ? [1, 0, 0] : [0, 1, 1],
+                  }),
+                } : null,
+                isPrevRoute ? {
+                  transform: [
                     {
-                      alignItems: 'flex-start',
-                      opacity: animationProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: isGoingBack ? [0, 1] : [1, 0],
+                      translateX: animationProgress.interpolate({
+                        inputRange: [0, 0.999, 1],
+                        outputRange: isGoingBack ? [0, 0, 0] : [0, -SCREEN_WIDTH, -SCREEN_WIDTH],
                       }),
-                      transform: [
-                        {
-                          translateY: animationProgress.interpolate({
-                            inputRange: [0, 0.999, 1],
-                            outputRange:
-                              isGoingBack ?
-                               [0, 0, 0] :
-                               [0, 0, -SCREEN_WIDTH],
-                          }),
-                        },
-                      ],
                     },
-                  ]}
-                >
-                  {prevLeftPart}
-                </Animated.View> :
-                null
-              }
-              {prevBackBtn}
-            </View> :
-            <View />
+                  ],
+                } : null,
+                isPrevRoute ? {
+                  opacity: animationProgress.interpolate({
+                    inputRange: [0, 0.8, 1],
+                    outputRange: isGoingBack ? [0, 1, 1] : [1, 0, 0],
+                  }),
+                } : null,
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={leftPart.onPress}
+                hitSlop={{
+                  left: 10,
+                  top: 0,
+                  right: 10,
+                  bottom: 0,
+                }}
+              >
+                {backIcon ||
+                  <Ionicon
+                    style={styles.backBtnIcon}
+                    onLayout={this._onBackIconLayout}
+                    name={BACK_ICON_NAME}
+                    size={BACK_ICON_SIZE}
+                    color={
+                      leftPart.textStyle.color ||
+                      NAV_BAR_DEFAULT_TINT_COLOR
+                    }
+                  />
+                }
+                {IS_IOS &&
+                  <Animated.Text
+                    numberOfLines={1}
+                    allowFontScaling={false}
+                    style={[
+                      styles.backBtnText,
+                      leftPart.textStyle,
+                      isCurrentRoute && shouldAnimateNavBarParts ? {
+                        transform: [
+                          {
+                            translateX: animationProgress.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: isGoingBack ?
+                              [
+                                0,
+                                prevTitleXPos -
+                                (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
+                              ] :
+                              [
+                                prevTitleXPos -
+                                (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth),
+                                0,
+                              ],
+                            }),
+                          },
+                        ],
+                      } : null,
+                      isPrevRoute && shouldAnimateNavBarParts ? {
+                        transform: [
+                          {
+                            translateX: animationProgress.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: isGoingBack ? [-leftPartWidth, 0] : [0, -leftPartWidth],
+                            }),
+                          },
+                        ],
+                      } : null,
+                    ]}
+                  >
+                    {leftPart.text}
+                  </Animated.Text>
+                }
+              </TouchableOpacity>
+            </Animated.View>;
+
+            leftPart = null;
           }
-          {!(crossPlatformUI || IS_IOS) && prevTitlePart}
-          {prevRightPart ?
+
+          leftPartWidth = leftPart || backBtn ? leftPartWidth : 0;
+
+          const rightPart =
+            route && routeMapper.RightPart(route, navigator) || null;
+
+          rightPartWidth = rightPart ? rightPartWidth : 0;
+
+          const title = route && routeMapper.Title(route, navigator) || null;
+
+          const prevTitlePartWidth =
+            navBarWidth - (prevLeftPartWidth + prevRightPartWidth + paddingHorizontal);
+
+          const titlePart = title ?
             <View
-              style={styles.rightPartContainer}
+              style={(crossPlatformUI || IS_IOS) ? styles.titlePart_ios : styles.titlePart_android}
               pointerEvents={'box-none'}
-              onLayout={IS_IOS ? this._onPrevRightPartLayout : null}
             >
               <Animated.View
                 style={[
                   styles.animatedWrapper,
                   {
-                    alignItems: 'flex-end',
-                    opacity: animationProgress.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: isGoingBack ? [0, 1] : [1, 0],
-                    }),
+                    paddingHorizontal: (crossPlatformUI || IS_IOS) ?
+                      Math.max(leftPartWidth, rightPartWidth) + paddingHorizontal:
+                      0,
+                    alignItems: (crossPlatformUI || IS_IOS) ? 'center' : 'flex-start',
+                  },
+                  isCurrentRoute && shouldAnimateNavBarParts ? {
                     transform: [
+                      {
+                        translateX: animationProgress.interpolate({
+                          inputRange: [0, 0.999, 1],
+                          outputRange:
+                            isGoingBack ?
+                            [
+                              0,
+                              (navBarWidth / 2) + (navBarWidth * 0.2),
+                              -SCREEN_WIDTH,
+                            ] :
+                            [
+                              (navBarWidth / 2) + (navBarWidth * 0.2),
+                              0,
+                              0,
+                            ],
+                        }),
+                      },
+                    ],
+                  } : null,
+                  isCurrentRoute ? {
+                    opacity: animationProgress.interpolate({
+                      inputRange: [0, 0.66, 1],
+                      outputRange: isGoingBack ? [1, 0, 0] : [0, 0.2, 1],
+                    }),
+                  } : null,
+                  isPrevRoute ? {
+                    transform: [
+                      {
+                        translateX: shouldAnimateNavBarParts ? animationProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange:
+                            isGoingBack ?
+                            [
+                              prevTitlePartWidth - prevTitleWidth > 0 ?
+                                -(prevTitleXPos -
+                                (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
+                                 : 0,
+                              0,
+                            ] :
+                            [
+                              0,
+                              prevTitlePartWidth - prevTitleWidth > 0 ?
+                                -(prevTitleXPos -
+                                (PADDING_HORIZONTAL + paddingHorizontal + backIconWidth))
+                                 : 0,
+                            ],
+                        }) : 0,
+                      },
                       {
                         translateY: animationProgress.interpolate({
                           inputRange: [0, 0.999, 1],
@@ -720,84 +515,165 @@ export default class NavBar extends React.Component {
                         }),
                       },
                     ],
-                  },
-                ]}
-              >
-                {prevRightPart}
-              </Animated.View>
-            </View> :
-          null
-         }
-        </View>
-
-        <View // LAYER
-          style={[
-            styles.layer,
-            {
-              marginTop: getOrientation() === 'PORTRAIT' ?
-                NAV_BAR_STYLES.General.StatusBarHeight :
-                0,
-              paddingHorizontal:
-                (getOrientation() === 'LANDSCAPE' && isIphoneX() ? 44 : 0) +
-                (paddingHorizontal || 0),
-            },
-            fixedHeight ? { marginTop: 0 } : null,
-          ]}
-          pointerEvents={'box-none'}
-        >
-          {(crossPlatformUI || IS_IOS) && titlePart}
-          {(leftPart && animationFromIndex !== animationToIndex) || backBtn ?
-            <View
-              style={styles.leftPartContainer}
-              pointerEvents={'box-none'}
-              onLayout={IS_IOS ? this._onLeftPartLayout : null}
-            >
-              {leftPart && animationFromIndex !== animationToIndex ?
-                <Animated.View
-                  style={[
-                    styles.animatedWrapper,
-                    {
-                      alignItems: 'flex-start',
-                      opacity: animationProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: isGoingBack ? [1, 0] : [0, 1],
-                      }),
-                    },
-                  ]}
-                >
-                  {leftPart}
-                </Animated.View> :
-                null
-              }
-              {backBtn}
-            </View> :
-            <View />
-          }
-          {!(crossPlatformUI || IS_IOS) && titlePart}
-          {rightPart && animationFromIndex !== animationToIndex ?
-            <View
-              style={styles.rightPartContainer}
-              pointerEvents={'box-none'}
-              onLayout={IS_IOS ? this._onRightPartLayout : null}
-            >
-              <Animated.View
-                style={[
-                  styles.animatedWrapper,
-                  {
-                    alignItems: 'flex-end',
+                  } : null,
+                  isPrevRoute ? {
                     opacity: animationProgress.interpolate({
                       inputRange: [0, 1],
-                      outputRange: isGoingBack ? [1, 0] : [0, 1],
+                      outputRange: isGoingBack ? [0, 1] : [1, 0],
                     }),
-                  },
+                  } : null,
                 ]}
               >
-                {rightPart}
+                {/* for measuring prev title */}
+                {IS_IOS && isPrevRoute ?
+                  <View
+                    onLayout={this._onPrevTitleLayout}
+                    pointerEvents={'none'}
+                    style={{
+                      opacity: 0,
+                      position: 'absolute',
+                    }}
+                  >
+                    {title}
+                  </View> :
+                  null
+                }
+                {title}
               </Animated.View>
             </View> :
-            null
-          }
-        </View>
+            null;
+
+          return (
+            <View
+              key={route.__navigatorRouteID}
+              style={[
+                styles.layer,
+                {
+                  marginTop: getOrientation() === 'PORTRAIT' ?
+                    NAV_BAR_STYLES.General.StatusBarHeight :
+                    0,
+                  paddingHorizontal:
+                    (getOrientation() === 'LANDSCAPE' && isIphoneX() ? 44 : 0) +
+                    (paddingHorizontal || 0),
+                },
+                fixedHeight ? { marginTop: 0 } : null,
+                !isCurrentRoute && !isPrevRoute ? {
+                  opacity: 0,
+                } : null,
+              ]}
+              pointerEvents={'box-none'}
+            >
+              {(crossPlatformUI || IS_IOS) && titlePart}
+              {leftPart || backBtn ?
+                <View
+                  style={styles.leftPartContainer}
+                  pointerEvents={'box-none'}
+                  onLayout={
+                    IS_IOS &&
+                    (
+                      (isCurrentRoute && this._onLeftPartLayout) ||
+                      (isPrevRoute && this._onPrevLeftPartLayout)
+                    ) ||
+                    null
+                  }
+                >
+                  {leftPart ?
+                    <Animated.View
+                      style={[
+                        styles.animatedWrapper,
+                        {
+                          alignItems: 'flex-start',
+                        },
+                        isCurrentRoute ? {
+                          opacity: animationProgress.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: isGoingBack ? [1, 0] : [0, 1],
+                          }),
+                        } : null,
+                        isPrevRoute ? {
+                          transform: [
+                            {
+                              translateY: animationProgress.interpolate({
+                                inputRange: [0, 0.999, 1],
+                                outputRange:
+                                  isGoingBack ?
+                                   [0, 0, 0] :
+                                   [0, 0, -SCREEN_WIDTH],
+                              }),
+                            },
+                          ],
+                        } : null,
+                        isPrevRoute ? {
+                          opacity: animationProgress.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: isGoingBack ? [0, 1] : [1, 0],
+                          }),
+                        } : null,
+                      ]}
+                    >
+                      {leftPart}
+                    </Animated.View> :
+                    null
+                  }
+                  {backBtn}
+                </View> :
+                <View />
+              }
+              {!(crossPlatformUI || IS_IOS) && titlePart}
+              {rightPart ?
+                <View
+                  style={styles.rightPartContainer}
+                  pointerEvents={'box-none'}
+                  onLayout={
+                    IS_IOS &&
+                    (
+                      (isCurrentRoute && this._onRightPartLayout) ||
+                      (isPrevRoute && this._onPrevRightPartLayout)
+                    ) ||
+                    null
+                  }
+                >
+                  <Animated.View
+                    style={[
+                      styles.animatedWrapper,
+                      {
+                        alignItems: 'flex-end',
+                      },
+                      isCurrentRoute ? {
+                        opacity: animationProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: isGoingBack ? [1, 0] : [0, 1],
+                        }),
+                      } : null,
+                      isPrevRoute ? {
+                        transform: [
+                          {
+                            translateY: animationProgress.interpolate({
+                              inputRange: [0, 0.999, 1],
+                              outputRange:
+                                isGoingBack ?
+                                  [0, 0, 0] :
+                                  [0, 0, -SCREEN_WIDTH],
+                            }),
+                          },
+                        ],
+                      } : null,
+                      isPrevRoute ? {
+                        opacity: animationProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: isGoingBack ? [0, 1] : [1, 0],
+                        }),
+                      } : null,
+                    ]}
+                  >
+                    {rightPart}
+                  </Animated.View>
+                </View> :
+              null
+             }
+            </View>
+          )
+        })}
       </Animated.View>
     );
   }

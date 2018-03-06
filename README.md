@@ -121,7 +121,7 @@ class MyScene extends React.Component {
     },
     /**
      * @param  {object} props [route props]
-     * @return {ReactElement|Object}
+     * @return {Class|JSX}
      */
     renderNavBarRightPart(props) {
       return MyButtonComponent
@@ -279,19 +279,29 @@ There are two options:
    const ref = `${navigationDelegate.id || `${navigator.state.presentedIndex + 1}_scene`}_leftPart|rightPart|title`;
 
    // usage
-   this.props.navigator._navBar.refs['navDelegateId_rightPart'].doSmth()
+   this.props.navigator.navBarParts['navDelegateId_rightPart'].doSmth()
    // or if navigationDelegate id is not defined
-   this.props.navigator._navBar.refs['1_scene_rightPart'].doSmth()
+   this.props.navigator.navBarParts['1_scene_rightPart'].doSmth()
    ```
 
    ​
 
-2. If you want re-render your navBar component with new props or just re-render, then you should use navBar's `updateUI` method
+2. If you want re-render your navBar component with new props or just re-render use the template
+
+```javascript
+YourComponentClass.navigationDelegate.renderTitle = () => // return component here with the new props
+
+this.props.navigator.forceUpdateNavBar();
+```
 
 Also NavBar component has some helpful methods
 - `show`('fade'|'slide') __default behavior is `fade`__
 - `hide`('fade'|'slide') __default behavior is `fade`__
 
+```javascript
+this.props.navigator.showNavBar('slide');
+this.props.navigator.hideNavBar('fade');
+```
 
 ```javascript
 class MyNavBarTitle extends React.Component {
@@ -322,20 +332,18 @@ class MyNavBarTitle extends React.Component {
 
 class MyScene extends React.Component {
   onBtnPress() {
-    this.props.navigator._navBar
-    updateUI({
-      title: <MyNavBarTitle text={'Re rendered'}>,
-      rightPart: (
-        <TouchableOpacity onPress={() => 'onBtnPress'}>
-          <Text style={{fontSize: 12}}>{'Updated btn'}</Text>
-        </TouchableOpacity>
-      ),
-      // leftPart: <MyAwesomeBtn text={'left'}/>,
-    })
+    MyScene.navigationDelegate.renderTitle = () => <MyNavBarTitle text={'Re rendered'} />
+    MyScene.navigationDelegate.renderNavBarRightPart = () => (
+      <TouchableOpacity onPress={() => 'onBtnPress'}>
+        <Text style={{fontSize: 12}}>{'Updated btn'}</Text>
+      </TouchableOpacity>
+    );
+
+    this.props.navigator.forceUpdateNavBar();
   }
 
   onNavBarTitlePress() {
-    this.props.navigator._navBar.refs['myScene_title'].setState({
+    this.props.navigator.navBarParts.myScene_title.setState({
       text: 'Other title',
     })
   }

@@ -48,8 +48,15 @@ const isIphoneX = () => {
   );
 }
 
+const getNavigationOption = (route, option) => {
+  return route && route.component &&
+    getNavigationDelegate(route.component) &&
+    getNavigationDelegate(route.component)[option];
+}
+
 export {
   getNavigationDelegate,
+  getNavigationOption,
   getOrientation,
   replaceInstanceEventedProps,
   isIphoneX,

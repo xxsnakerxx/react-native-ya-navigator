@@ -442,7 +442,7 @@ var Navigator = createReactClass({
     };
   },
 
-  componentWillMount: function() {
+  UNSAFE_componentWillMount: function() {
     // TODO(t7489503): Don't need this once ES6 Class landed.
     this.__defineGetter__('navigationContext', this._getNavigationContext);
 
