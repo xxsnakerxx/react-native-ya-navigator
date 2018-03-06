@@ -75,8 +75,7 @@ export default class YANavigator extends React.Component {
       this._backPressSub = BackHandler.addEventListener('hardwareBackPress', () => {
         if (!this.state.shouldHandleAndroidBack) return false;
 
-        const { navigator } = this.refs;
-        const navState = navigator.state;
+        const navState = this.fbNavigator.state;
         const presentedComponent =
           navState.routeStack[navState.presentedIndex].component;
         const navigationDelegate = getNavigationDelegate(presentedComponent);
@@ -87,7 +86,7 @@ export default class YANavigator extends React.Component {
 
           return true;
         } else if (navState.routeStack.length > 1) {
-          navigator.pop();
+          this.pop();
 
           return true;
         }
@@ -492,9 +491,8 @@ export default class YANavigator extends React.Component {
   }
 
   _onWillFocus = (route) => {
-    const { navigator } = this.refs;
     const component = route.component;
-    const state = navigator && navigator.state;
+    const state = this.fbNavigator && this.fbNavigator.state;
 
     if (state) {
       setTimeout(() => {
