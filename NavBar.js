@@ -61,7 +61,7 @@ export default class NavBar extends React.Component {
       animationFromIndex: 0,
       animationToIndex: 0,
       navBarOpacity: new Animated.Value(props.isHiddenOnInit ? 0 : 1),
-      navBarYPos: new Animated.Value(props.isHiddenOnInit ? -NAV_HEIGHT : 0),
+      navBarYPos: new Animated.Value(0),
       navBarWidth: SCREEN_WIDTH,
       navBarHeight: getOrientation() === 'PORTRAIT' ? NAV_HEIGHT :
         (IS_IOS ? NAVBAR_LANDSCAPE_HEIGHT_IOS : NAVBAR_LANDSCAPE_HEIGHT_ANDROID),
@@ -90,7 +90,7 @@ export default class NavBar extends React.Component {
       animationFromIndex: 0,
       animationToIndex: 0,
       navBarOpacity: new Animated.Value(this.props.isHiddenOnInit ? 0 : 1),
-      navBarYPos: new Animated.Value(this.props.isHiddenOnInit ? -NAV_HEIGHT : 0),
+      navBarYPos: new Animated.Value(0),
       prevLeftPartWidth: 0,
       leftPartWidth: 0,
       prevRightPartWidth: 0,
@@ -196,12 +196,12 @@ export default class NavBar extends React.Component {
       backIcon,
       fixedHeight,
       crossPlatformUI,
+      isHiddenOnInit,
     } = this.props;
 
     const {
       animationProgress,
       navBarYPos,
-      navBarOpacity,
       navBarWidth,
       navBarHeight,
       prevTitleXPos,
@@ -214,6 +214,7 @@ export default class NavBar extends React.Component {
     } = this.state;
 
     let {
+      navBarOpacity,
       leftPartWidth,
       rightPartWidth,
     } = this.state;
@@ -279,28 +280,35 @@ export default class NavBar extends React.Component {
       !((!isGoingBack && routeNavBarIsHidden || isGoingBack && prevRouteNavBarIsHidden) ||
       (isGoingBack && routeNavBarIsHidden || !isGoingBack && prevRouteNavBarIsHidden));
 
+    if (animationToIndex === animationFromIndex &&
+      animationFromIndex === 0 &&
+      isHiddenOnInit) {
+      navBarOpacity._updateValue(0)
+    } else if (!isGoingBack && routeNavBarIsHidden || isGoingBack && prevRouteNavBarIsHidden) {
+      navBarOpacity = animationProgress.interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: [1, 0, 0],
+      });
+    } else if (isGoingBack && routeNavBarIsHidden || !isGoingBack && prevRouteNavBarIsHidden) {
+      navBarOpacity = animationProgress.interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: [0, 0, 1],
+      });
+    } else {
+      navBarOpacity._updateValue(1);
+    }
+
     return (
       <Animated.View
         onLayout={this._onNavBarLayout}
+        pointerEvents={navBarOpacity.__getValue() === 0 ? 'box-none' : undefined}
         style={[
           style,
           styles.navBar,
           navBarBackgroundColorStyle,
           {
             height: !fixedHeight ? navBarHeight : fixedHeight,
-            opacity: (!isGoingBack && routeNavBarIsHidden ||
-                isGoingBack && prevRouteNavBarIsHidden) ?
-                  animationProgress.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [1, 0, 0],
-                  }) :
-                (isGoingBack && routeNavBarIsHidden ||
-                !isGoingBack && prevRouteNavBarIsHidden) ?
-                  animationProgress.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [0, 0, 1],
-                  }) :
-                navBarOpacity,
+            opacity: navBarOpacity,
             transform: [
               {
                 translateY: navBarYPos,
