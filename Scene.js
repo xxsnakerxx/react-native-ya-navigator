@@ -57,8 +57,14 @@ export default class Scene extends React.Component {
 
             this._events = null;
 
-            // restore here because we might change it by navBar.updateUI etc...
-            delegate.constructor.navigationDelegate = navigationDelegateCopy;
+            // restore prev state here because we might change it
+            Object.keys(navigationDelegateCopy).forEach((key) => {
+              if (navigationDelegate[key]) {
+                navigationDelegate[key] = navigationDelegateCopy[key];
+              } else {
+                delete navigationDelegate[key];
+              }
+            });
           },
         });
       }
