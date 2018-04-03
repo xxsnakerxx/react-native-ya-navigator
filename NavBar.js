@@ -548,7 +548,7 @@ export default class NavBar extends React.Component {
                 ]}
               >
                 {/* for measuring title */}
-                {IS_IOS ?
+                {(crossPlatformUI || IS_IOS) ?
                   <View
                     onLayout={e => this._onTitleLayout(e, index)}
                     pointerEvents="none"
@@ -591,7 +591,7 @@ export default class NavBar extends React.Component {
                 <View
                   style={styles.leftPartContainer}
                   pointerEvents="box-none"
-                  onLayout={IS_IOS && (e => this._onLeftPartLayout(e, index))}
+                  onLayout={(crossPlatformUI || IS_IOS) ? (e => this._onLeftPartLayout(e, index)) : null}
                 >
                   {leftPart ?
                     <Animated.View
@@ -640,7 +640,7 @@ export default class NavBar extends React.Component {
                 <View
                   style={styles.rightPartContainer}
                   pointerEvents="box-none"
-                  onLayout={IS_IOS && (e => this._onRightPartLayout(e, index))}
+                  onLayout={(crossPlatformUI || IS_IOS) ? (e => this._onRightPartLayout(e, index)) : null}
                 >
                   <Animated.View
                     style={[
