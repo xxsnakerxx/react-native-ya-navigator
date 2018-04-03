@@ -66,6 +66,7 @@ class App extends React.Component {
 - `navBarUnderlay` (the view that will be rendered under all navBar items ([react-native-blur](https://github.com/react-native-fellowship/react-native-blur) for example))
 - `navBarBackBtn`
   - `icon`
+  - `iconWidth` (if you provide custom icon, set this for properly title animations on iOS)
   - `textStyle`
 - `eachSceneProps` (these props will be passed to each scene, for example, if you are using YANavigator inside tabs, you can to pass 'selected' prop to each scene, so each scene can decide should it updated via shouldComponentUpdate if it was hidden)
 - `customEventedProps` (you can pass here array of prop names that you need for link your custom components rendered in navigation bar)

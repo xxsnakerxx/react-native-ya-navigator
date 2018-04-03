@@ -193,6 +193,7 @@ export default class YANavigator extends React.Component {
         isHiddenOnInit={isHiddenOnInit}
         style={navBarStyle}
         backIcon={navBarBackBtn.icon}
+        backIconWidth={navBarBackBtn.iconWidth}
         underlay={navBarUnderlay}
         fixedHeight={navBarFixedHeight}
         crossPlatformUI={navBarCrossPlatformUI}
@@ -562,6 +563,7 @@ export default class YANavigator extends React.Component {
     navBarUnderlay: PropTypes.object,
     navBarBackBtn: PropTypes.shape({
       icon: PropTypes.object,
+      iconWidth: PropTypes.number,
       textStyle: PropTypes.object,
     }),
     navBarCrossPlatformUI: PropTypes.bool,
@@ -580,7 +582,9 @@ export default class YANavigator extends React.Component {
     navBarFixedHeight: 0,
     navBarCrossPlatformUI: false,
     navBarBackBtn: {
-      textStyle: {},
+      textStyle: null,
+      icon: null,
+      iconWidth: 0,
     },
     customEventedProps: [],
   };
