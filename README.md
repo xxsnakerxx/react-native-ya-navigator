@@ -1,3 +1,5 @@
+# The project is not maintained any more!!!
+
 # React Native Yet Another Navigator
 
 ![preview_ios](images/ya_navigator_ios.gif)
